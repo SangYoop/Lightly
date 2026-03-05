@@ -1,5 +1,5 @@
-// Spot Selector Client-side Logic
-// Handles fetching spots and user selection
+// Urban Fresh - Spot Selector (Mobile-First)
+// Optimized for one-handed operation and quick selection
 
 (function() {
     'use strict';
@@ -23,44 +23,67 @@
         }
     }
     
-    // Render spot cards
+    // Render spot cards (Mobile-First Design)
     function renderSpots(spots) {
         spotsContainer.innerHTML = spots.map(spot => `
-            <div class="spot-card rounded-2xl p-8 cursor-pointer" 
+            <div class="spot-card rounded-3xl p-6 cursor-pointer" 
                  data-spot-id="${spot.id}"
                  role="button"
                  tabindex="0"
                  aria-label="${spot.name} 선택">
-                <div class="flex justify-between items-start mb-6">
-                    <div class="status-badge text-sm font-semibold neo-mint">
+                
+                <!-- Status & Time Row -->
+                <div class="flex items-center justify-between mb-5">
+                    <div class="status-badge neo-mint">
                         <span class="status-dot"></span>
-                        ${spot.status === 'open' ? 'OPEN' : 'CLOSED'}
+                        <span>OPEN NOW</span>
                     </div>
-                    <div class="text-xs text-gray-500">
-                        ~${spot.availableUntil}
+                    <div class="text-xs text-gray-500 font-semibold">
+                        마감 ${spot.availableUntil}
                     </div>
                 </div>
                 
-                <h2 class="text-2xl font-bold mb-3">${spot.name}</h2>
-                <p class="text-gray-400 text-sm mb-4">${spot.address}</p>
+                <!-- Spot Name & District -->
+                <div class="mb-4">
+                    <div class="text-xs text-gray-500 mb-1 font-medium uppercase tracking-wide">
+                        ${spot.district}
+                    </div>
+                    <h2 class="text-2xl font-black leading-tight mb-2">
+                        ${spot.name}
+                    </h2>
+                    <p class="text-sm text-gray-400 leading-relaxed">
+                        ${spot.address}
+                    </p>
+                </div>
                 
+                <!-- Action Hint -->
                 <div class="flex items-center justify-between pt-4 border-t border-gray-800">
-                    <span class="text-xs text-gray-500">거점 코드</span>
-                    <span class="text-xs font-mono neo-mint">${spot.id.toUpperCase()}</span>
+                    <span class="text-xs text-gray-600">탭하여 선택</span>
+                    <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/>
+                    </svg>
                 </div>
+                
             </div>
         `).join('');
         
-        // Add click handlers
-        attachClickHandlers();
+        // Add touch handlers
+        attachTouchHandlers();
     }
     
-    // Attach click handlers to spot cards
-    function attachClickHandlers() {
+    // Attach touch-optimized handlers
+    function attachTouchHandlers() {
         const cards = spotsContainer.querySelectorAll('.spot-card');
         
         cards.forEach(card => {
+            // Touch events for mobile
+            card.addEventListener('touchstart', handleTouchStart, { passive: true });
+            card.addEventListener('touchend', handleTouchEnd, { passive: false });
+            
+            // Click fallback for desktop
             card.addEventListener('click', handleSpotSelection);
+            
+            // Keyboard accessibility
             card.addEventListener('keypress', (e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
                     e.preventDefault();
@@ -70,46 +93,73 @@
         });
     }
     
-    // Handle spot selection
+    let touchStartTime = 0;
+    
+    function handleTouchStart(event) {
+        touchStartTime = Date.now();
+        this.style.transform = 'scale(0.98)';
+    }
+    
+    function handleTouchEnd(event) {
+        const touchDuration = Date.now() - touchStartTime;
+        
+        // Only trigger if touch was quick (not a scroll)
+        if (touchDuration < 200) {
+            event.preventDefault();
+            handleSpotSelection.call(this, event);
+        } else {
+            this.style.transform = '';
+        }
+    }
+    
+    // Handle spot selection with haptic feedback
     function handleSpotSelection(event) {
         const spotId = this.dataset.spotId;
         
         if (!spotId) return;
         
-        // Add visual feedback
-        this.style.transform = 'scale(0.98)';
-        this.style.opacity = '0.7';
+        // Add selected animation
+        this.classList.add('selected');
+        
+        // Haptic feedback (if available)
+        if (navigator.vibrate) {
+            navigator.vibrate(50);
+        }
         
         // Save to localStorage
         localStorage.setItem('selectedSpot', spotId);
         localStorage.setItem('selectedSpotTimestamp', Date.now().toString());
         
-        // Navigate to dashboard after brief delay
+        // Show feedback
+        this.style.borderColor = '#00FF85';
+        this.style.background = 'rgba(0, 255, 133, 0.08)';
+        
+        // Navigate after animation
         setTimeout(() => {
             window.location.href = '/dashboard';
-        }, 300);
+        }, 400);
     }
     
-    // Show error message
+    // Show error message (Mobile-optimized)
     function showError(message) {
         spotsContainer.innerHTML = `
-            <div class="col-span-full text-center py-12">
-                <div class="text-red-400 mb-4">
-                    <svg class="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="text-center py-12">
+                <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-red-500/10 flex items-center justify-center">
+                    <svg class="w-8 h-8 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                              d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                              d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                     </svg>
                 </div>
-                <p class="text-gray-400">${message}</p>
+                <p class="text-gray-400 mb-6 px-4">${message}</p>
                 <button onclick="location.reload()" 
-                        class="mt-6 px-6 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition">
+                        class="px-6 py-3 bg-gray-800 hover:bg-gray-700 rounded-full transition text-sm font-semibold">
                     다시 시도
                 </button>
             </div>
         `;
     }
     
-    // Initialize on page load
+    // Initialize
     loadSpots();
     
 })();
