@@ -82,6 +82,18 @@ app.get('/', (c) => {
                 background: #00FF85;
             }
             
+            /* Bold Header Typography */
+            .main-title {
+                font-size: clamp(3rem, 12vw, 5rem);
+                font-weight: 900;
+                line-height: 0.9;
+                letter-spacing: -0.04em;
+            }
+            
+            .subtitle {
+                font-size: clamp(0.875rem, 3.5vw, 1rem);
+            }
+            
             /* Mobile-First Spot Card */
             .spot-card {
                 background: rgba(249, 250, 251, 0.04);
@@ -174,21 +186,23 @@ app.get('/', (c) => {
         <!-- Mobile-First Layout -->
         <div class="min-h-screen flex flex-col safe-top safe-bottom">
             
-            <!-- Header - Compact for mobile -->
-            <header class="px-5 pt-8 pb-6">
-                <div class="flex items-center justify-between mb-6">
-                    <div class="text-xs text-gray-500 tracking-wider uppercase">Step 1 of 3</div>
-                    <div class="text-xs text-gray-500">Urban Fresh</div>
+            <!-- Header - Bold & Impactful -->
+            <header class="px-6 pt-12 pb-8">
+                <div class="flex items-center justify-between mb-8">
+                    <div class="text-xs text-gray-500 tracking-widest uppercase font-semibold">Step 1 of 3</div>
+                    <div class="text-xs text-gray-500 font-medium">Urban Fresh</div>
                 </div>
-                <h1 class="text-3xl font-black leading-tight tracking-tight mb-2">
-                    Pick Your<br><span class="neo-mint">Spot</span>
+                <h1 class="main-title mb-4">
+                    Pick<br>Your<br><span class="neo-mint">Spot</span>
                 </h1>
-                <p class="text-sm text-gray-400">픽업할 오피스 거점을 선택하세요</p>
+                <p class="subtitle text-gray-400 font-medium">
+                    픽업할 오피스 거점을 선택하세요
+                </p>
             </header>
             
             <!-- Spots List - Full Screen Mobile -->
-            <main class="flex-1 px-5 pb-6">
-                <div class="space-y-4" id="spotsContainer">
+            <main class="flex-1 px-6 pb-8">
+                <div class="space-y-5" id="spotsContainer">
                     <!-- Loading state -->
                     <div class="flex flex-col items-center justify-center py-16">
                         <div class="spinner"></div>
@@ -198,11 +212,11 @@ app.get('/', (c) => {
             </main>
             
             <!-- Bottom Navigation Hint -->
-            <footer class="px-5 py-4 border-t border-gray-800">
-                <div class="flex items-center justify-center gap-2 text-xs text-gray-600">
-                    <div class="w-1.5 h-1.5 rounded-full neo-mint-bg"></div>
-                    <div class="w-1.5 h-1.5 rounded-full bg-gray-700"></div>
-                    <div class="w-1.5 h-1.5 rounded-full bg-gray-700"></div>
+            <footer class="px-6 py-6 border-t border-gray-800/50">
+                <div class="flex items-center justify-center gap-2.5">
+                    <div class="w-2 h-2 rounded-full neo-mint-bg"></div>
+                    <div class="w-2 h-2 rounded-full bg-gray-700"></div>
+                    <div class="w-2 h-2 rounded-full bg-gray-700"></div>
                 </div>
             </footer>
             
@@ -235,19 +249,28 @@ app.get('/dashboard', (c) => {
             .neo-mint {
                 color: #00FF85;
             }
+            .main-title {
+                font-size: clamp(3rem, 12vw, 5rem);
+                font-weight: 900;
+                line-height: 0.9;
+                letter-spacing: -0.04em;
+            }
         </style>
     </head>
-    <body class="min-h-screen p-5">
-        <div class="max-w-md mx-auto pt-8">
-            <div class="text-xs text-gray-500 mb-4">Step 2 of 3</div>
-            <h1 class="text-3xl font-black mb-6">
-                Your <span class="neo-mint">Collections</span>
-            </h1>
-            <div class="bg-gray-900 rounded-2xl p-6 mb-6">
-                <div class="text-sm text-gray-400 mb-2">선택한 거점</div>
-                <div id="selectedSpot" class="text-lg font-bold neo-mint">로딩 중...</div>
+    <body class="min-h-screen">
+        <div class="px-6 pt-12">
+            <div class="flex items-center justify-between mb-8">
+                <div class="text-xs text-gray-500 tracking-widest uppercase font-semibold">Step 2 of 3</div>
+                <div class="text-xs text-gray-500 font-medium">Urban Fresh</div>
             </div>
-            <a href="/" class="text-sm text-gray-400 hover:text-gray-200">← 거점 다시 선택</a>
+            <h1 class="main-title mb-8">
+                Your<br><span class="neo-mint">Collections</span>
+            </h1>
+            <div class="bg-gray-900/50 rounded-3xl p-6 mb-8 border border-gray-800">
+                <div class="text-sm text-gray-400 mb-3 font-medium">선택한 거점</div>
+                <div id="selectedSpot" class="text-xl font-bold neo-mint">로딩 중...</div>
+            </div>
+            <a href="/" class="text-sm text-gray-400 hover:text-gray-200 font-medium">← 거점 다시 선택</a>
         </div>
         
         <script>
