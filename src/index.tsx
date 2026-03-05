@@ -19,6 +19,7 @@ const spotsData = [
     district: '강남',
     status: 'open',
     availableUntil: '18:00',
+    orderDeadline: '2026-03-05T18:00:00+09:00',
     coordinates: { lat: 37.5012, lng: 127.0396 }
   },
   {
@@ -28,13 +29,88 @@ const spotsData = [
     district: '역삼',
     status: 'open',
     availableUntil: '18:00',
+    orderDeadline: '2026-03-05T18:00:00+09:00',
     coordinates: { lat: 37.4986, lng: 127.0329 }
+  }
+]
+
+// Collections data structure
+const collectionsData = [
+  {
+    id: 'sharp',
+    number: '01',
+    name: 'Sharp',
+    tagline: 'Focused Energy',
+    description: '집중력과 에너지가 필요한 오후를 위한 선택',
+    unitsLeft: 12,
+    price: 18900,
+    image: '/static/images/sharp.jpg',
+    ingredients: ['퀴노아', '그릴드 치킨', '아보카도', '방울토마토', '레몬 드레싱'],
+    nutrition: {
+      calories: 520,
+      protein: 42,
+      carbs: 48,
+      fat: 18
+    },
+    tags: ['고단백', '저당']
+  },
+  {
+    id: 'vital',
+    number: '02',
+    name: 'Vital',
+    tagline: 'Fresh Balance',
+    description: '신선한 재료로 완성한 완벽한 영양 밸런스',
+    unitsLeft: 8,
+    price: 16900,
+    image: '/static/images/vital.jpg',
+    ingredients: ['케일', '연어', '고구마', '브로콜리', '참깨 드레싱'],
+    nutrition: {
+      calories: 480,
+      protein: 38,
+      carbs: 52,
+      fat: 14
+    },
+    tags: ['오메가3', '항산화']
+  },
+  {
+    id: 'calm',
+    number: '03',
+    name: 'Calm',
+    tagline: 'Gentle Comfort',
+    description: '부드럽고 편안한 한 끼, 스트레스 없는 식사',
+    unitsLeft: 15,
+    price: 15900,
+    image: '/static/images/calm.jpg',
+    ingredients: ['현미', '두부', '버섯', '시금치', '된장 드레싱'],
+    nutrition: {
+      calories: 420,
+      protein: 28,
+      carbs: 58,
+      fat: 12
+    },
+    tags: ['저칼로리', '식이섬유']
   }
 ]
 
 // API: Get available spots
 app.get('/api/spots', (c) => {
   return c.json({ spots: spotsData })
+})
+
+// API: Get collections by spot
+app.get('/api/collections/:spotId', (c) => {
+  const spotId = c.req.param('spotId')
+  const spot = spotsData.find(s => s.id === spotId)
+  
+  if (!spot) {
+    return c.json({ error: 'Spot not found' }, 404)
+  }
+  
+  return c.json({ 
+    spot,
+    collections: collectionsData,
+    orderDeadline: spot.orderDeadline
+  })
 })
 
 // Main page: Spot Selector (Mobile-First)
@@ -228,7 +304,7 @@ app.get('/', (c) => {
   `)
 })
 
-// Dashboard page (Mobile-First)
+// Dashboard page (Collection Grid - Mobile-First)
 app.get('/dashboard', (c) => {
   return c.html(`
     <!DOCTYPE html>
@@ -237,57 +313,194 @@ app.get('/dashboard', (c) => {
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
         <meta name="theme-color" content="#1A1A1B">
-        <title>Urban Fresh - Dashboard</title>
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <title>Urban Fresh - Collections</title>
         <script src="https://cdn.tailwindcss.com"></script>
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
         <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+                -webkit-tap-highlight-color: transparent;
+            }
+            
+            html, body {
+                height: 100%;
+                overflow-x: hidden;
+            }
+            
             body {
-                font-family: 'Inter', sans-serif;
+                font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
                 background: #1A1A1B;
                 color: #F9FAFB;
+                -webkit-font-smoothing: antialiased;
+                padding-bottom: 100px; /* Space for floating button */
             }
+            
             .neo-mint {
                 color: #00FF85;
             }
-            .main-title {
-                font-size: clamp(3rem, 12vw, 5rem);
-                font-weight: 900;
-                line-height: 0.9;
-                letter-spacing: -0.04em;
+            
+            .neo-mint-bg {
+                background: #00FF85;
+            }
+            
+            /* Collection Card */
+            .collection-card {
+                background: rgba(249, 250, 251, 0.04);
+                border: 2px solid rgba(249, 250, 251, 0.08);
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                touch-action: manipulation;
+            }
+            
+            .collection-card:active {
+                transform: scale(0.98);
+                border-color: #00FF85;
+            }
+            
+            /* Image Placeholder with Gradient */
+            .image-placeholder {
+                background: linear-gradient(135deg, rgba(0, 255, 133, 0.1), rgba(0, 255, 133, 0.02));
+                position: relative;
+                overflow: hidden;
+            }
+            
+            .image-placeholder::before {
+                content: '';
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                width: 60%;
+                height: 60%;
+                background: radial-gradient(circle, rgba(0, 255, 133, 0.2), transparent);
+            }
+            
+            /* Timer Pulse Animation */
+            .timer-pulse {
+                animation: pulse-border 2s ease-in-out infinite;
+            }
+            
+            @keyframes pulse-border {
+                0%, 100% {
+                    border-color: rgba(0, 255, 133, 0.3);
+                }
+                50% {
+                    border-color: rgba(0, 255, 133, 0.6);
+                }
+            }
+            
+            /* Floating Button */
+            .floating-button {
+                position: fixed;
+                bottom: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                width: calc(100% - 48px);
+                max-width: 400px;
+                z-index: 50;
+                box-shadow: 0 20px 60px rgba(0, 255, 133, 0.3);
+            }
+            
+            /* Drawer */
+            .drawer {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                background: #1A1A1B;
+                border-top-left-radius: 24px;
+                border-top-right-radius: 24px;
+                transform: translateY(100%);
+                transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                z-index: 100;
+                max-height: 85vh;
+                overflow-y: auto;
+            }
+            
+            .drawer.open {
+                transform: translateY(0);
+            }
+            
+            .drawer-backdrop {
+                position: fixed;
+                inset: 0;
+                background: rgba(0, 0, 0, 0.6);
+                opacity: 0;
+                pointer-events: none;
+                transition: opacity 0.3s;
+                z-index: 99;
+            }
+            
+            .drawer-backdrop.open {
+                opacity: 1;
+                pointer-events: auto;
+            }
+            
+            /* Safe area */
+            .safe-bottom {
+                padding-bottom: env(safe-area-inset-bottom);
             }
         </style>
     </head>
-    <body class="min-h-screen">
-        <div class="px-6 pt-12">
-            <div class="flex items-center justify-between mb-8">
-                <div class="text-xs text-gray-500 tracking-widest uppercase font-semibold">Step 2 of 3</div>
-                <div class="text-xs text-gray-500 font-medium">Urban Fresh</div>
+    <body>
+        <!-- Header with Spot & Timer -->
+        <header class="sticky top-0 z-40 bg-gradient-to-b from-[#1A1A1B] to-transparent backdrop-blur-sm">
+            <div class="px-6 pt-8 pb-4">
+                <div class="flex items-start justify-between">
+                    <!-- Selected Spot -->
+                    <div>
+                        <div class="text-xs text-gray-500 mb-1 font-medium uppercase tracking-wider">Pickup at</div>
+                        <h2 id="spotName" class="text-lg font-black">로딩 중...</h2>
+                    </div>
+                    
+                    <!-- Real-time Timer -->
+                    <div class="text-right timer-pulse border-2 border-[#00FF85]/30 rounded-xl px-3 py-2">
+                        <div class="text-xs text-gray-500 mb-0.5 font-medium">마감까지</div>
+                        <div id="countdown" class="text-sm font-black neo-mint">--:--:--</div>
+                    </div>
+                </div>
             </div>
-            <h1 class="main-title mb-8">
-                Your<br><span class="neo-mint">Collections</span>
-            </h1>
-            <div class="bg-gray-900/50 rounded-3xl p-6 mb-8 border border-gray-800">
-                <div class="text-sm text-gray-400 mb-3 font-medium">선택한 거점</div>
-                <div id="selectedSpot" class="text-xl font-bold neo-mint">로딩 중...</div>
+        </header>
+        
+        <!-- Collections Grid -->
+        <main class="px-6 pt-4 pb-8">
+            <div class="mb-6">
+                <div class="text-xs text-gray-500 tracking-widest uppercase font-semibold mb-3">Step 2 of 3</div>
+                <h1 class="text-4xl font-black mb-2 leading-tight">
+                    The<br><span class="neo-mint">Collection</span>
+                </h1>
+                <p class="text-sm text-gray-400">오늘의 신선한 메뉴를 선택하세요</p>
             </div>
-            <a href="/" class="text-sm text-gray-400 hover:text-gray-200 font-medium">← 거점 다시 선택</a>
+            
+            <div class="space-y-5" id="collectionsContainer">
+                <!-- Loading -->
+                <div class="text-center py-12">
+                    <div class="inline-block w-8 h-8 border-4 border-gray-800 border-t-[#00FF85] rounded-full animate-spin"></div>
+                    <p class="mt-4 text-sm text-gray-500">메뉴 불러오는 중...</p>
+                </div>
+            </div>
+        </main>
+        
+        <!-- Floating Button (Hidden initially) -->
+        <button id="reviewButton" class="floating-button bg-[#00FF85] text-[#1A1A1B] py-4 rounded-full font-black text-base hidden">
+            Review Your Collection
+        </button>
+        
+        <!-- Drawer (Slide-up Detail View) -->
+        <div class="drawer-backdrop" id="drawerBackdrop"></div>
+        <div class="drawer safe-bottom" id="drawer">
+            <div class="sticky top-0 bg-[#1A1A1B] z-10 px-6 pt-6 pb-4">
+                <div class="w-12 h-1 bg-gray-700 rounded-full mx-auto mb-6"></div>
+                <button id="closeDrawer" class="text-gray-400 text-sm font-medium">← 닫기</button>
+            </div>
+            <div id="drawerContent" class="px-6 pb-8">
+                <!-- Dynamic content -->
+            </div>
         </div>
         
-        <script>
-            const selectedSpotId = localStorage.getItem('selectedSpot');
-            if (selectedSpotId) {
-                fetch('/api/spots')
-                    .then(res => res.json())
-                    .then(data => {
-                        const spot = data.spots.find(s => s.id === selectedSpotId);
-                        if (spot) {
-                            document.getElementById('selectedSpot').textContent = spot.name;
-                        }
-                    });
-            } else {
-                window.location.href = '/';
-            }
-        </script>
+        <script src="/static/dashboard.js"></script>
     </body>
     </html>
   `)
