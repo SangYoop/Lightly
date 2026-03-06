@@ -18,8 +18,9 @@ const spotsData = [
     address: '서울특별시 강남구 테헤란로 311',
     district: '강남',
     status: 'open',
-    availableUntil: '18:00',
-    orderDeadline: '2026-03-05T18:00:00+09:00',
+    orderDeadline: '10:00',
+    orderDeadlineISO: new Date(new Date().toDateString() + ' 10:00:00 GMT+0900').toISOString(),
+    pickupTime: '11:30',
     coordinates: { lat: 37.5012, lng: 127.0396 }
   },
   {
@@ -28,8 +29,9 @@ const spotsData = [
     address: '서울특별시 강남구 테헤란로 7길 22',
     district: '역삼',
     status: 'open',
-    availableUntil: '18:00',
-    orderDeadline: '2026-03-05T18:00:00+09:00',
+    orderDeadline: '10:00',
+    orderDeadlineISO: new Date(new Date().toDateString() + ' 10:00:00 GMT+0900').toISOString(),
+    pickupTime: '11:30',
     coordinates: { lat: 37.4986, lng: 127.0329 }
   }
 ]
@@ -43,7 +45,7 @@ const collectionsData = [
     tagline: 'Focused Energy',
     description: '집중력과 에너지가 필요한 오후를 위한 선택',
     unitsLeft: 12,
-    price: 18900,
+    price: 9900,
     image: '/static/images/sharp.jpg',
     ingredients: ['퀴노아', '그릴드 치킨', '아보카도', '방울토마토', '레몬 드레싱'],
     nutrition: {
@@ -52,7 +54,8 @@ const collectionsData = [
       carbs: 48,
       fat: 18
     },
-    tags: ['고단백', '저당']
+    tags: ['고단백', '저당'],
+    supplement: '이번 주 웰니스: 활력 비타민 B 콤플렉스 스틱 1포'
   },
   {
     id: 'vital',
@@ -61,7 +64,7 @@ const collectionsData = [
     tagline: 'Fresh Balance',
     description: '신선한 재료로 완성한 완벽한 영양 밸런스',
     unitsLeft: 8,
-    price: 16900,
+    price: 9900,
     image: '/static/images/vital.jpg',
     ingredients: ['케일', '연어', '고구마', '브로콜리', '참깨 드레싱'],
     nutrition: {
@@ -70,7 +73,8 @@ const collectionsData = [
       carbs: 52,
       fat: 14
     },
-    tags: ['오메가3', '항산화']
+    tags: ['오메가3', '항산화'],
+    supplement: '이번 주 웰니스: 면역력 프로폴리스 추출물 캡슐 1정'
   },
   {
     id: 'calm',
@@ -79,7 +83,7 @@ const collectionsData = [
     tagline: 'Gentle Comfort',
     description: '부드럽고 편안한 한 끼, 스트레스 없는 식사',
     unitsLeft: 15,
-    price: 15900,
+    price: 9900,
     image: '/static/images/calm.jpg',
     ingredients: ['현미', '두부', '버섯', '시금치', '된장 드레싱'],
     nutrition: {
@@ -88,7 +92,8 @@ const collectionsData = [
       carbs: 58,
       fat: 12
     },
-    tags: ['저칼로리', '식이섬유']
+    tags: ['저칼로리', '식이섬유'],
+    supplement: '이번 주 웰니스: 숙면 마그네슘 + 감태 혼합정 1정'
   }
 ]
 
@@ -112,7 +117,8 @@ app.get('/api/collections/:spotId', (c) => {
   return c.json({ 
     spot,
     collections: collectionsData,
-    orderDeadline: spot.orderDeadline
+    orderDeadline: spot.orderDeadlineISO,
+    pickupTime: spot.pickupTime
   })
 })
 
@@ -712,15 +718,22 @@ app.get('/order-success', (c) => {
                 
                 <!-- Sub-text -->
                 <div class="fade-in-up-delay-1 mb-12">
-                    <p class="text-base text-gray-400 font-light leading-relaxed">
-                        바쁜 도심 속에서 찾아낸<br>
-                        오직 당신만을 위한 웰니스로<br>
-                        곧 찾아갈게요.
+                    <p class="text-lg text-gray-300 font-light leading-relaxed mb-6">
+                        오늘 당신은<br>
+                        <span class="text-2xl font-semibold neo-mint">500g의 신선함</span>과<br>
+                        <span class="text-2xl font-semibold neo-mint">15분의 여유</span>를 선택했습니다.
+                    </p>
+                    <p class="text-sm text-gray-500 font-light leading-relaxed">
+                        이 조합은 오늘 당신의 오후를<br>
+                        가장 완벽하게 만들 것입니다.
                     </p>
                 </div>
                 
                 <!-- Pulse Tracker -->
                 <div class="fade-in-up-delay-2 mb-16">
+                    <div class="text-xs text-gray-600 uppercase tracking-widest mb-2 font-semibold">
+                        The Lifestyle Report
+                    </div>
                     <div class="text-xs text-gray-600 uppercase tracking-widest mb-6 font-semibold">
                         Current Status
                     </div>

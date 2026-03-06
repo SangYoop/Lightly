@@ -39,7 +39,7 @@
                         <span>OPEN NOW</span>
                     </div>
                     <div class="text-xs text-gray-500 font-semibold">
-                        마감 ${spot.availableUntil}
+                        ${spot.orderDeadline} 마감 / ${spot.pickupTime} 픽업
                     </div>
                 </div>
                 

@@ -94,10 +94,14 @@
                 'role="button" tabindex="0">' +
                 
                 '<!-- Image Area -->' +
-                '<div class="image-placeholder aspect-[4/3] flex items-center justify-center">' +
-                    '<div class="text-center">' +
-                        '<div class="text-6xl font-black text-white/20 mb-2">' + collection.number + '</div>' +
-                        '<div class="text-sm text-gray-500 uppercase tracking-widest">Image Placeholder</div>' +
+                '<div class="image-placeholder aspect-[4/3] flex items-center justify-center p-8">' +
+                    '<div class="text-center max-w-sm">' +
+                        '<div class="text-6xl font-black text-white/10 mb-4">' + collection.number + '</div>' +
+                        '<div class="text-xs text-gray-600 leading-relaxed font-light">' +
+                            'Deep Slate 배경에 대비되는<br>' +
+                            '아주 신선한 유기농 채소 이미지<br>' +
+                            '<span class="neo-mint">Digital-Organic</span> Concept' +
+                        '</div>' +
                     '</div>' +
                 '</div>' +
                 
@@ -210,10 +214,20 @@
                 '</div>' +
             '</div>' +
             
+            '<!-- Weekly Wellness (건기식) -->' +
+            '<div class="mb-6 bg-gradient-to-r from-green-900/20 to-emerald-900/10 border border-[#00FF85]/20 rounded-2xl p-5">' +
+                '<div class="flex items-center gap-2 mb-3">' +
+                    '<span class="text-2xl">💊</span>' +
+                    '<div class="text-sm font-bold neo-mint">Weekly Wellness</div>' +
+                '</div>' +
+                '<p class="text-sm text-gray-300 leading-relaxed">' + collection.supplement + '</p>' +
+                '<div class="mt-3 text-xs text-gray-500">매주 바뀌는 프리미엄 건강기능식품 1회분 제공</div>' +
+            '</div>' +
+            
             '<!-- Confirm & Reserve Button -->' +
             '<button class="w-full py-5 bg-[#00FF85] text-[#1A1A1B] rounded-full font-black text-lg tracking-tight" ' +
                     'onclick="window.confirmAndReserve(\'' + collection.id + '\')">' +
-                'Confirm & Reserve' +
+                'Confirm & Reserve · ₩9,900' +
             '</button>';
         
         // Show drawer
