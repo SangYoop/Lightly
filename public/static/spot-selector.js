@@ -1,12 +1,8 @@
-// Urban Fresh - Spot Selector (Mobile-First)
-// Optimized for one-handed operation and quick selection
-
 (function() {
     'use strict';
     
     const spotsContainer = document.getElementById('spotsContainer');
     
-    // Fetch spots from API
     async function loadSpots() {
         try {
             const response = await fetch('/api/spots');
@@ -18,7 +14,6 @@
                 showError('현재 이용 가능한 거점이 없습니다.');
             }
         } catch (error) {
-            console.error('Failed to load spots:', error);
             showError('거점 정보를 불러오는데 실패했습니다.');
         }
     }

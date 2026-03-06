@@ -1,8 +1,6 @@
-// Urban Fresh - My Rhythm Page
 (function() {
     'use strict';
     
-    // DOM Elements
     const userName = document.getElementById('userName');
     const totalOrders = document.getElementById('totalOrders');
     const activeOrderSection = document.getElementById('activeOrderSection');
@@ -12,7 +10,6 @@
     const activePickupTime = document.getElementById('activePickupTime');
     const historyContainer = document.getElementById('historyContainer');
     
-    // Status labels
     const statusLabels = {
         'crafting': 'Crafting',
         'on_the_way': 'On the Way',
@@ -20,7 +17,6 @@
         'completed': 'Completed'
     };
     
-    // Initialize
     async function init() {
         try {
             const response = await fetch('/api/my-rhythm');
@@ -31,12 +27,10 @@
                 totalOrders.textContent = data.user.totalOrders;
             }
             
-            // Render active order
             if (data.activeOrder) {
                 renderActiveOrder(data.activeOrder);
             }
             
-            // Render order history
             if (data.history && data.history.length > 0) {
                 renderHistory(data.history);
             } else {
@@ -44,7 +38,6 @@
             }
             
         } catch (error) {
-            console.error('Failed to load My Rhythm data:', error);
             historyContainer.innerHTML = '<div class="text-center py-12"><p class="text-sm text-red-500">데이터를 불러올 수 없습니다</p></div>';
         }
     }

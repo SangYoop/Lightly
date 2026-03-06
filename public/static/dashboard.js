@@ -1,6 +1,3 @@
-// Urban Fresh - Collection Grid Dashboard
-// Real-time countdown, collection cards, and slide-up drawer
-
 (function() {
     'use strict';
     
@@ -8,7 +5,6 @@
     let selectedCollections = JSON.parse(localStorage.getItem('selectedCollections') || '[]');
     let countdownInterval;
     
-    // Redirect if no spot selected
     if (!selectedSpotId) {
         window.location.href = '/';
         return;
@@ -45,7 +41,6 @@
             renderCollections(data.collections);
             
         } catch (error) {
-            console.error('Failed to load collections:', error);
             showError('메뉴를 불러오는데 실패했습니다.');
         }
     }

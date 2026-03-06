@@ -1,15 +1,8 @@
-// Urban Fresh - Order Success with Real-time Status Updates
-// Simulates Supabase real-time subscription
-
 (function() {
     'use strict';
     
     const orderId = localStorage.getItem('currentOrderId');
     const confirmedCollectionId = localStorage.getItem('confirmedCollection');
-    
-    if (!orderId) {
-        console.warn('No order ID found');
-    }
     
     const collectionNames = {
         'sharp': '01. Sharp',
@@ -89,10 +82,8 @@
     async function loadSpotData() {
         let selectedSpotId = localStorage.getItem('selectedSpot');
         
-        // Fallback to default spot for testing
         if (!selectedSpotId) {
             selectedSpotId = 'dreamplus-gangnam';
-            console.log('No selectedSpot in localStorage, using default:', selectedSpotId);
         }
         
         try {
@@ -103,7 +94,6 @@
                 spotData = data.spots.find(function(s) {
                     return s.id === selectedSpotId;
                 });
-                console.log('Loaded spotData:', spotData);
             }
         } catch (error) {
             console.error('Failed to load spot data:', error);
@@ -201,22 +191,11 @@
     // Pickup details modal setup
     function setupPickupDetailsModal() {
         if (!showPickupDetailsBtn || !pickupModal || !closeModalBtn || !modalBackdrop) {
-            console.error('Modal elements not found:', {
-                btn: !!showPickupDetailsBtn,
-                modal: !!pickupModal,
-                closeBtn: !!closeModalBtn,
-                backdrop: !!modalBackdrop
-            });
             return;
         }
         
-        console.log('Modal setup complete, spotData:', spotData);
-        
         showPickupDetailsBtn.addEventListener('click', function() {
-            console.log('Button clicked, spotData:', spotData);
-            
             if (!spotData || !spotData.pickupDetails) {
-                console.error('No spot data or pickupDetails:', spotData);
                 alert('픽업 위치 정보를 불러올 수 없습니다.');
                 return;
             }
@@ -226,8 +205,6 @@
             const modalDescription = document.getElementById('modalPickupDescription');
             const modalGuide = document.getElementById('modalPickupGuide');
             const modalSpotName = document.getElementById('modalSpotName');
-            
-            console.log('Populating modal with:', spotData.pickupDetails);
             
             if (modalSpotName) modalSpotName.textContent = spotData.name;
             if (modalImage) modalImage.src = spotData.pickupDetails.image;
