@@ -506,4 +506,247 @@ app.get('/dashboard', (c) => {
   `)
 })
 
+// Order Success Page - The Lifestyle Report
+app.get('/order-success', (c) => {
+  return c.html(`
+    <!DOCTYPE html>
+    <html lang="ko">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+        <meta name="theme-color" content="#1A1A1B">
+        <title>Urban Fresh - Order Confirmed</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+            
+            body {
+                font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+                background: #1A1A1B;
+                color: #F9FAFB;
+                min-height: 100vh;
+                overflow-x: hidden;
+            }
+            
+            .neo-mint {
+                color: #00FF85;
+            }
+            
+            /* Fade In Animation */
+            .fade-in-up {
+                animation: fadeInUp 1s ease-out forwards;
+                opacity: 0;
+            }
+            
+            .fade-in-up-delay-1 {
+                animation: fadeInUp 1s ease-out 0.3s forwards;
+                opacity: 0;
+            }
+            
+            .fade-in-up-delay-2 {
+                animation: fadeInUp 1s ease-out 0.6s forwards;
+                opacity: 0;
+            }
+            
+            .fade-in-up-delay-3 {
+                animation: fadeInUp 1s ease-out 0.9s forwards;
+                opacity: 0;
+            }
+            
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(30px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+            
+            /* Pulse Tracker */
+            .pulse-line {
+                position: relative;
+                height: 2px;
+                background: rgba(249, 250, 251, 0.1);
+            }
+            
+            .pulse-progress {
+                position: absolute;
+                left: 0;
+                top: 0;
+                height: 100%;
+                background: #00FF85;
+                width: 33.33%;
+                box-shadow: 0 0 20px rgba(0, 255, 133, 0.5);
+            }
+            
+            .pulse-wave {
+                animation: pulseWave 2s ease-in-out infinite;
+            }
+            
+            @keyframes pulseWave {
+                0%, 100% {
+                    box-shadow: 0 0 20px rgba(0, 255, 133, 0.5);
+                }
+                50% {
+                    box-shadow: 0 0 40px rgba(0, 255, 133, 0.8);
+                }
+            }
+            
+            .pulse-dot {
+                width: 12px;
+                height: 12px;
+                border-radius: 50%;
+                background: #1A1A1B;
+                border: 2px solid rgba(249, 250, 251, 0.2);
+                transition: all 0.3s;
+            }
+            
+            .pulse-dot.active {
+                background: #00FF85;
+                border-color: #00FF85;
+                box-shadow: 0 0 20px rgba(0, 255, 133, 0.6);
+                animation: pulseDot 2s ease-in-out infinite;
+            }
+            
+            @keyframes pulseDot {
+                0%, 100% {
+                    transform: scale(1);
+                }
+                50% {
+                    transform: scale(1.2);
+                }
+            }
+            
+            /* Button Line Art Style */
+            .btn-line-art {
+                border: 1.5px solid rgba(249, 250, 251, 0.2);
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+            
+            .btn-line-art:active {
+                border-color: #00FF85;
+                background: rgba(0, 255, 133, 0.05);
+                transform: scale(0.98);
+            }
+        </style>
+    </head>
+    <body>
+        <div class="min-h-screen flex flex-col items-center justify-center px-6 py-12">
+            
+            <!-- Main Content - Magazine Layout -->
+            <div class="max-w-md w-full text-center">
+                
+                <!-- Headline -->
+                <div class="fade-in-up mb-8">
+                    <h1 class="text-6xl font-black mb-6 leading-tight tracking-tighter">
+                        The<br>Urban<br><span class="neo-mint">Standard.</span>
+                    </h1>
+                </div>
+                
+                <!-- Sub-text -->
+                <div class="fade-in-up-delay-1 mb-12">
+                    <p class="text-base text-gray-400 font-light leading-relaxed">
+                        바쁜 도심 속에서 찾아낸<br>
+                        오직 당신만을 위한 웰니스로<br>
+                        곧 찾아갈게요.
+                    </p>
+                </div>
+                
+                <!-- Pulse Tracker -->
+                <div class="fade-in-up-delay-2 mb-16">
+                    <div class="text-xs text-gray-600 uppercase tracking-widest mb-6 font-semibold">
+                        Current Status
+                    </div>
+                    
+                    <!-- Progress Line -->
+                    <div class="pulse-line mb-6">
+                        <div class="pulse-progress pulse-wave"></div>
+                    </div>
+                    
+                    <!-- Status Dots -->
+                    <div class="flex justify-between items-center relative">
+                        <div class="flex-1 text-center">
+                            <div class="pulse-dot active mx-auto mb-2"></div>
+                            <div class="text-xs font-semibold neo-mint">Crafting</div>
+                        </div>
+                        <div class="flex-1 text-center">
+                            <div class="pulse-dot mx-auto mb-2"></div>
+                            <div class="text-xs text-gray-600">On the Way</div>
+                        </div>
+                        <div class="flex-1 text-center">
+                            <div class="pulse-dot mx-auto mb-2"></div>
+                            <div class="text-xs text-gray-600">Arrived</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Log: Optimized Selection -->
+                <div class="fade-in-up-delay-3 mb-12">
+                    <div class="bg-gray-900/30 border border-gray-800 rounded-2xl p-6">
+                        <div class="text-xs text-gray-600 uppercase tracking-wider mb-4 font-semibold">
+                            Log: Optimized Selection
+                        </div>
+                        <div class="grid grid-cols-3 gap-4 text-center" id="orderMeta">
+                            <div>
+                                <div class="text-2xl font-black neo-mint mb-1">15</div>
+                                <div class="text-xs text-gray-500">Minutes</div>
+                            </div>
+                            <div>
+                                <div class="text-2xl font-black mb-1">480g</div>
+                                <div class="text-xs text-gray-500">Protein</div>
+                            </div>
+                            <div>
+                                <div class="text-2xl font-black mb-1" id="collectionName">--</div>
+                                <div class="text-xs text-gray-500">Collection</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="fade-in-up-delay-3 space-y-4">
+                    <button class="btn-line-art w-full py-4 rounded-full text-sm font-semibold tracking-wide">
+                        Add to My Calendar
+                    </button>
+                    <button class="btn-line-art w-full py-4 rounded-full text-sm font-semibold tracking-wide" onclick="window.location.href='/'">
+                        Keep My Rhythm
+                    </button>
+                </div>
+                
+            </div>
+            
+        </div>
+        
+        <script>
+            // Load confirmed collection data
+            const confirmedCollectionId = localStorage.getItem('confirmedCollection');
+            const collectionNames = {
+                'sharp': 'Sharp',
+                'vital': 'Vital',
+                'calm': 'Calm'
+            };
+            
+            if (confirmedCollectionId) {
+                document.getElementById('collectionName').textContent = collectionNames[confirmedCollectionId] || '--';
+            }
+            
+            // Haptic feedback on page load
+            if (navigator.vibrate) {
+                setTimeout(function() {
+                    navigator.vibrate([50, 100, 50]);
+                }, 500);
+            }
+        </script>
+    </body>
+    </html>
+  `)
+})
+
 export default app

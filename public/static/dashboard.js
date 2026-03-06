@@ -210,10 +210,10 @@
                 '</div>' +
             '</div>' +
             
-            '<!-- Add to Selection Button -->' +
-            '<button class="w-full py-4 bg-[#00FF85] text-[#1A1A1B] rounded-full font-black text-base" ' +
-                    'onclick="window.addToSelection(\'' + collection.id + '\')">' +
-                '선택하기' +
+            '<!-- Confirm & Reserve Button -->' +
+            '<button class="w-full py-5 bg-[#00FF85] text-[#1A1A1B] rounded-full font-black text-lg tracking-tight" ' +
+                    'onclick="window.confirmAndReserve(\'' + collection.id + '\')">' +
+                'Confirm & Reserve' +
             '</button>';
         
         // Show drawer
@@ -235,7 +235,53 @@
     closeDrawer.addEventListener('click', closeDrawerFunc);
     drawerBackdrop.addEventListener('click', closeDrawerFunc);
     
-    // Add to selection
+    // Confirm and Reserve (Checkout)
+    window.confirmAndReserve = function(collectionId) {
+        // Save selected collection
+        localStorage.setItem('confirmedCollection', collectionId);
+        
+        // Close drawer
+        closeDrawerFunc();
+        
+        // Show connecting animation then redirect
+        showConnectingAnimation();
+        
+        setTimeout(function() {
+            window.location.href = '/order-success';
+        }, 2500);
+    };
+    
+    // Show connecting animation
+    function showConnectingAnimation() {
+        const overlay = document.createElement('div');
+        overlay.style.cssText = 
+            'position: fixed; inset: 0; background: #1A1A1B; z-index: 1000; ' +
+            'display: flex; flex-direction: column; align-items: center; justify-content: center; ' +
+            'animation: fadeIn 0.3s ease-out;';
+        
+        overlay.innerHTML = 
+            '<div style="text-align: center;">' +
+                '<div style="width: 80px; height: 80px; margin: 0 auto 32px; border: 3px solid rgba(0,255,133,0.2); ' +
+                     'border-top-color: #00FF85; border-radius: 50%; animation: spin 1s linear infinite;"></div>' +
+                '<div style="font-size: 1.25rem; font-weight: 700; color: #F9FAFB; margin-bottom: 8px;">Connecting to the kitchen</div>' +
+                '<div style="font-size: 0.875rem; color: #6B7280;">주문을 전송하는 중...</div>' +
+            '</div>';
+        
+        const style = document.createElement('style');
+        style.textContent = 
+            '@keyframes spin { to { transform: rotate(360deg); } }' +
+            '@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }';
+        
+        document.head.appendChild(style);
+        document.body.appendChild(overlay);
+        
+        // Haptic feedback
+        if (navigator.vibrate) {
+            navigator.vibrate([50, 100, 50, 100, 50]);
+        }
+    };
+    
+    // Add to selection (old function - kept for compatibility)
     window.addToSelection = function(collectionId) {
         if (!selectedCollections.includes(collectionId)) {
             selectedCollections.push(collectionId);
