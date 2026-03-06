@@ -83,7 +83,7 @@
 
 ### **Step 2: The Collection Grid**
 **화면**: `/dashboard`
-- ✅ Sticky 헤더 (거점명 + 실시간 타이머)
+- ✅ Sticky 헤더 (거점명 + 실시간 타이머 + **유저 아이콘**)
 - ✅ 3가지 컬렉션 카드 (Sharp, Vital, Calm)
 - ✅ Bento Grid 레이아웃
 - ✅ Slide-up Drawer (영양 정보, 재료)
@@ -126,6 +126,22 @@
 - ✅ 상세 안내 설명 (위치, 방법)
 - ✅ 동적 콘텐츠 렌더링
 
+### **Step 7: My Rhythm (마이페이지)**
+**화면**: `/my-rhythm`
+- ✅ Dashboard 헤더에 유저 아이콘 추가
+- ✅ 우아한 헤더 ("당신만의 리듬을 확인하세요")
+- ✅ 뒤로 가기 버튼 (thin line icon)
+- ✅ User Info (Urbanist님, 주문 횟수)
+- ✅ Active Order Card (진행 중인 주문)
+  - Neo-Mint gradient + pulse border animation
+  - Status badge (Crafting 상태)
+  - Pickup time 표시
+- ✅ Order History Grid (Bento style)
+  - 과거 주문 내역 (날짜, 메뉴명, 거점)
+  - Completed status badge
+  - Date + Time icons
+- ✅ Mock data (3개 historical orders)
+
 ## 📋 Currently Completed Features
 ✅ **3-Tap 주문 플로우 완성**
 - Step 1: 거점 선택 (모바일 우선)
@@ -156,6 +172,13 @@
 - 거점별 상세 안내 (위치, 방법, 사진)
 - QR 코드 및 픽업 코드 표시
 
+✅ **마이페이지 (My Rhythm)**
+- User profile 표시
+- Active order tracking
+- Order history (Bento Grid)
+- Status badges
+- Dashboard에서 접근 가능
+
 ✅ **데이터 정책**
 - 가격 정책: 모든 컬렉션 ₩9,900 고정
 - 운영 시간: 주문 마감 10:00 / 픽업 11:30
@@ -164,23 +187,26 @@
 ## 🔄 Features Not Yet Implemented
 ❌ Supabase 데이터베이스 연동 (현재 in-memory)
 ❌ 실제 결제 시스템 (PG 연동)  
-❌ 주문 히스토리 및 마이페이지
+❌ 실제 사용자 인증/로그인
+❌ 주문 상세 보기 (History 클릭 시)
 ❌ 푸시 알림 (주문 상태 변경 시)
 ❌ 실제 이미지 업로드 (현재 플레이스홀더)  
 ❌ Supabase Realtime 구독 (현재 polling)
 ❌ 캘린더 연동 (Add to Calendar 버튼)  
 ❌ 관리자 대시보드
 ❌ 주문 취소 기능
-❌ 회원가입/로그인
+❌ 프로필 편집 기능
 
 ## 🎯 Recommended Next Steps
-1. **Supabase 통합**: spots, collections, orders 테이블 생성 및 마이그레이션
-2. **실시간 구독**: polling → Supabase Realtime 전환
-3. **실제 이미지**: 픽업 존 사진, 메뉴 이미지 업로드
-4. **Cloudflare Pages 배포**: Production 환경 설정
-5. **GitHub 연동**: 소스 코드 저장소 설정
-6. **결제 연동**: PG사 (토스페이먼츠, 이니시스 등) 연동
-7. **관리자 패널**: 주문 관리, 재고 관리, 거점 관리  
+1. **Supabase 통합**: spots, collections, orders, users 테이블 생성 및 마이그레이션
+2. **사용자 인증**: Supabase Auth 연동 (이메일/소셜 로그인)
+3. **실시간 구독**: polling → Supabase Realtime 전환
+4. **실제 이미지**: 픽업 존 사진, 메뉴 이미지 업로드
+5. **주문 상세**: History 카드 클릭 시 상세 정보 모달
+6. **Cloudflare Pages 배포**: Production 환경 설정
+7. **GitHub 연동**: 소스 코드 저장소 설정
+8. **결제 연동**: PG사 (토스페이먼츠, 이니시스 등) 연동
+9. **관리자 패널**: 주문 관리, 재고 관리, 거점 관리  
 
 ## 🎯 User Journey (완성)
 
@@ -193,11 +219,12 @@
 
 ### 2️⃣ 메뉴 선택
 1. 선택한 거점 이름 표시
-2. 주문 마감까지 실시간 타이머 확인 (10:00 AM)
-3. 3가지 컬렉션 중 선택 (Sharp, Vital, Calm - 각 ₩9,900)
-4. 카드 탭 → Drawer 슬라이드업
-5. 영양 정보, 재료, Weekly Wellness 건강기능식품 확인
-6. "Confirm & Reserve · ₩9,900" 버튼 클릭
+2. **우측 상단 유저 아이콘 확인 (My Rhythm 진입점)**
+3. 주문 마감까지 실시간 타이머 확인 (10:00 AM)
+4. 3가지 컬렉션 중 선택 (Sharp, Vital, Calm - 각 ₩9,900)
+5. 카드 탭 → Drawer 슬라이드업
+6. 영양 정보, 재료, Weekly Wellness 건강기능식품 확인
+7. "Confirm & Reserve · ₩9,900" 버튼 클릭
 
 ### 3️⃣ 주문 확정
 1. "Connecting to the kitchen" 로딩 (2.5초)
@@ -216,6 +243,22 @@
 10. "Arrived" 상태 → Neo-Mint flash + Digital Pickup Pass 표시
 11. "Keep My Rhythm" 클릭 → 홈으로
 
+### 4️⃣ 마이페이지 (My Rhythm)
+1. Dashboard 헤더에서 **유저 아이콘 클릭**
+2. `/my-rhythm` 페이지 이동
+3. **User Info 확인**: Urbanist님, 총 주문 횟수
+4. **Active Order Card 확인** (진행 중인 주문이 있는 경우):
+   - Neo-Mint gradient background
+   - Collection name (예: 01. Sharp)
+   - Spot name (예: 드림플러스 강남)
+   - Status badge (Crafting)
+   - Pickup time (11:30 AM)
+5. **Order History 스크롤**:
+   - 과거 주문 내역 (Bento Grid)
+   - 각 카드: 날짜, 메뉴명, 거점, Completed 뱃지
+   - 예시: 3월 5일 - 01. Sharp - 드림플러스 강남
+6. 좌측 상단 **뒤로 가기** 버튼 클릭 → Dashboard 복귀
+
 ## 🛠️ Tech Stack
 - **Framework**: Hono (Cloudflare Workers/Pages)
 - **Language**: TypeScript
@@ -233,7 +276,8 @@ webapp/
 │   └── static/
 │       ├── spot-selector.js   # Step 1 로직
 │       ├── dashboard.js       # Step 2 로직
-│       └── order-success.js   # Step 3 로직 (Pulse Tracker, Modal)
+│       ├── order-success.js   # Step 3 로직 (Pulse Tracker, Modal)
+│       └── my-rhythm.js       # My Rhythm 페이지 로직
 ├── ecosystem.config.cjs       # PM2 설정
 ├── wrangler.jsonc            # Cloudflare 설정
 ├── package.json              # 의존성 관리
@@ -378,6 +422,42 @@ curl http://localhost:3000/api/collections/dreamplus-gangnam
     "status": "on_the_way",
     "updatedAt": "2026-03-06T12:10:00.000Z"
   }
+}
+```
+
+### GET `/api/my-rhythm`
+사용자 마이페이지 데이터 조회
+
+**Response:**
+```json
+{
+  "user": {
+    "name": "Urbanist",
+    "totalOrders": 3
+  },
+  "activeOrder": {
+    "id": "URB-CURRENT",
+    "collectionId": "sharp",
+    "collectionName": "01. Sharp",
+    "spotId": "dreamplus-gangnam",
+    "spotName": "드림플러스 강남",
+    "status": "crafting",
+    "pickupTime": "11:30",
+    "orderDate": "2026-03-06T13:00:00.000Z"
+  },
+  "history": [
+    {
+      "id": "URB-20260305001",
+      "date": "2026-03-05",
+      "dateFormatted": "3월 5일",
+      "collectionId": "sharp",
+      "collectionName": "01. Sharp",
+      "spotId": "dreamplus-gangnam",
+      "spotName": "드림플러스 강남",
+      "status": "completed",
+      "pickupTime": "11:30"
+    }
+  ]
 }
 ```
 
