@@ -37,9 +37,16 @@
   address: string,
   district: string,
   status: 'open' | 'closed',
-  availableUntil: string,
-  orderDeadline: string (ISO 8601),
-  coordinates: { lat, lng }
+  orderDeadline: string,      // "10:00"
+  orderDeadlineISO: string,   // ISO 8601 format
+  pickupTime: string,         // "11:30"
+  coordinates: { lat, lng },
+  pickupDetails: {
+    location: string,         // "B1층 로비"
+    description: string,      // 상세 안내 문구
+    guide: string,           // 픽업 방법
+    image: string            // 이미지 URL
+  }
 }
 ```
 
@@ -47,15 +54,16 @@
 ```typescript
 {
   id: string,
-  number: string,  // "01", "02", "03"
+  number: string,        // "01", "02", "03"
   name: string,
   tagline: string,
   description: string,
   unitsLeft: number,
-  price: number,
+  price: number,         // 9900 (₩9,900 고정)
   ingredients: string[],
   nutrition: { calories, protein, carbs, fat },
-  tags: string[]
+  tags: string[],
+  supplement: string     // Weekly Wellness 건강기능식품
 }
 ```
 
@@ -89,14 +97,40 @@
 - ✅ "The Urban Standard" 헤드라인
 - ✅ 페이드인 애니메이션 (staggered)
 - ✅ Pulse Tracker (Crafting → On the Way → Arrived)
-- ✅ Log: Optimized Selection (메타데이터)
+- ✅ Real-time status updates (polling simulation)
+- ✅ Digital Pickup Pass (on Arrived status)
+- ✅ Log: Optimized Selection (실제 주문 메타데이터)
+- ✅ Pickup Location Details Modal
 - ✅ "Add to My Calendar", "Keep My Rhythm" 버튼
+
+### **Step 4: Real-time Pulse Tracker**
+- ✅ Order status polling (2초 간격)
+- ✅ Status transition animations
+- ✅ Haptic feedback on status change
+- ✅ Admin simulator panel (테스트용)
+- ✅ Flash animation on "Arrived" status
+- ✅ Digital Pickup Pass reveal
+
+### **Step 5: Data & Logic Refinement**
+- ✅ 가격 정책: 모든 컬렉션 ₩9,900 고정
+- ✅ 운영 시간: 마감 10:00 / 픽업 11:30
+- ✅ Weekly Wellness 건강기능식품 추가
+- ✅ Drawer 디자인 개선 (웰니스 섹션)
+- ✅ 라이프스타일 리포트 문구 개선
+- ✅ 실제 Order Meta 표시 (MENU, SPOT, TIME)
+
+### **Step 6: Pickup Location Details**
+- ✅ SPOT 정보 옆 "상세 위치" 버튼 추가
+- ✅ Slide-up Modal 구현
+- ✅ 거점별 픽업 존 사진 (placeholder)
+- ✅ 상세 안내 설명 (위치, 방법)
+- ✅ 동적 콘텐츠 렌더링
 
 ## 📋 Currently Completed Features
 ✅ **3-Tap 주문 플로우 완성**
-- Step 1: 거점 선택
-- Step 2: 메뉴 컬렉션 선택
-- Step 3: 주문 확정 및 성공 화면
+- Step 1: 거점 선택 (모바일 우선)
+- Step 2: 메뉴 컬렉션 선택 (Drawer + Weekly Wellness)
+- Step 3: 주문 확정 및 성공 화면 (라이프스타일 리포트)
 
 ✅ **모바일 우선 디자인**
 - 원-핸드 조작 최적화
@@ -104,24 +138,49 @@
 - Safe area 지원 (노치 디바이스)
 
 ✅ **실시간 기능**
-- 카운트다운 타이머 (주문 마감까지)
-- Pulse Tracker 애니메이션
-- 재고 수량 표시
+- 카운트다운 타이머 (마감 10:00까지)
+- Pulse Tracker 애니메이션 (Crafting → On Way → Arrived)
+- Order status polling (2초 간격)
+- 재고 수량 실시간 표시
 
 ✅ **하이엔드 UX**
-- 부드러운 페이드인 애니메이션
-- 로딩 상태 피드백
+- 부드러운 페이드인 애니메이션 (staggered)
+- 로딩 상태 피드백 ("Connecting to the kitchen")
 - 잡지 편집 스타일 레이아웃
 - Line art 버튼 스타일
+- Neo-Mint flash animation on arrival
+
+✅ **픽업 시스템**
+- Digital Pickup Pass (Arrived 상태 시)
+- Pickup Location Details Modal
+- 거점별 상세 안내 (위치, 방법, 사진)
+- QR 코드 및 픽업 코드 표시
+
+✅ **데이터 정책**
+- 가격 정책: 모든 컬렉션 ₩9,900 고정
+- 운영 시간: 주문 마감 10:00 / 픽업 11:30
+- Weekly Wellness: 컬렉션별 건강기능식품 포함
 
 ## 🔄 Features Not Yet Implemented
-❌ Supabase 데이터베이스 연동  
+❌ Supabase 데이터베이스 연동 (현재 in-memory)
 ❌ 실제 결제 시스템 (PG 연동)  
-❌ 주문 히스토리  
-❌ 푸시 알림  
+❌ 주문 히스토리 및 마이페이지
+❌ 푸시 알림 (주문 상태 변경 시)
 ❌ 실제 이미지 업로드 (현재 플레이스홀더)  
-❌ 배송 추적 실시간 업데이트  
-❌ 캘린더 연동 (Add to Calendar)  
+❌ Supabase Realtime 구독 (현재 polling)
+❌ 캘린더 연동 (Add to Calendar 버튼)  
+❌ 관리자 대시보드
+❌ 주문 취소 기능
+❌ 회원가입/로그인
+
+## 🎯 Recommended Next Steps
+1. **Supabase 통합**: spots, collections, orders 테이블 생성 및 마이그레이션
+2. **실시간 구독**: polling → Supabase Realtime 전환
+3. **실제 이미지**: 픽업 존 사진, 메뉴 이미지 업로드
+4. **Cloudflare Pages 배포**: Production 환경 설정
+5. **GitHub 연동**: 소스 코드 저장소 설정
+6. **결제 연동**: PG사 (토스페이먼츠, 이니시스 등) 연동
+7. **관리자 패널**: 주문 관리, 재고 관리, 거점 관리  
 
 ## 🎯 User Journey (완성)
 
@@ -144,10 +203,13 @@
 1. "Connecting to the kitchen" 로딩 (2.5초)
 2. `/order-success` 이동
 3. "The Urban Standard" 헤드라인 페이드인
-4. 웰니스 메시지 표시
+4. 웰니스 메시지 표시 ("500g의 신선함과 15분의 여유")
 5. Pulse Tracker에서 "Crafting" 상태 확인
-6. 메타데이터 (15분, 480g, 컬렉션명) 확인
-7. "Keep My Rhythm" 클릭 → 홈으로
+6. Order Meta 확인 (MENU: 01. Sharp, SPOT: 드림플러스 강남, TIME: 11:30 AM)
+7. "상세 위치" 버튼 클릭 → Pickup Location Modal 확인
+8. (Admin 패널로 상태 변경 테스트 가능)
+9. "Arrived" 상태 → Digital Pickup Pass 표시
+10. "Keep My Rhythm" 클릭 → 홈으로
 
 ## 🛠️ Tech Stack
 - **Framework**: Hono (Cloudflare Workers/Pages)
@@ -165,7 +227,8 @@ webapp/
 ├── public/
 │   └── static/
 │       ├── spot-selector.js   # Step 1 로직
-│       └── dashboard.js       # Step 2 로직
+│       ├── dashboard.js       # Step 2 로직
+│       └── order-success.js   # Step 3 로직 (Pulse Tracker, Modal)
 ├── ecosystem.config.cjs       # PM2 설정
 ├── wrangler.jsonc            # Cloudflare 설정
 ├── package.json              # 의존성 관리
@@ -209,8 +272,15 @@ curl http://localhost:3000/api/collections/dreamplus-gangnam
       "address": "서울특별시 강남구 테헤란로 311",
       "district": "강남",
       "status": "open",
-      "availableUntil": "18:00",
-      "orderDeadline": "2026-03-05T18:00:00+09:00"
+      "orderDeadline": "10:00",
+      "pickupTime": "11:30",
+      "coordinates": { "lat": 37.5012, "lng": 127.0396 },
+      "pickupDetails": {
+        "location": "B1층 로비",
+        "description": "드림플러스 강남 B1층 로비, 엘리베이터 우측 어반프레시 전용 픽업 스테이션에 준비되어 있습니다.",
+        "guide": "스마트 락커에 표시된 픽업 코드를 입력하시면 자동으로 문이 열립니다.",
+        "image": "/static/images/pickup-dreamplus.jpg"
+      }
     }
   ]
 }
@@ -230,12 +300,79 @@ curl http://localhost:3000/api/collections/dreamplus-gangnam
       "name": "Sharp",
       "tagline": "Focused Energy",
       "unitsLeft": 12,
-      "price": 18900,
-      "nutrition": { "calories": 520, "protein": 42 },
-      "tags": ["고단백", "저당"]
+      "price": 9900,
+      "nutrition": { "calories": 520, "protein": 42, "carbs": 48, "fat": 18 },
+      "tags": ["고단백", "저당"],
+      "supplement": "이번 주 웰니스: 활력 비타민 B 콤플렉스 스틱 1포"
     }
   ],
-  "orderDeadline": "2026-03-05T18:00:00+09:00"
+  "orderDeadline": "2026-03-06T01:00:00.000Z",
+  "pickupTime": "11:30"
+}
+```
+
+### POST `/api/orders`
+주문 생성
+
+**Request Body:**
+```json
+{
+  "spotId": "dreamplus-gangnam",
+  "collectionId": "sharp"
+}
+```
+
+**Response:**
+```json
+{
+  "order": {
+    "id": "URB-XXXXX",
+    "spotId": "dreamplus-gangnam",
+    "collectionId": "sharp",
+    "status": "crafting",
+    "pickupCode": "7936",
+    "qrCode": "URB-XXXXX",
+    "pickupLocation": "B1층 Urban Fresh Zone",
+    "createdAt": "2026-03-06T12:00:00.000Z"
+  }
+}
+```
+
+### GET `/api/orders/:orderId`
+주문 상태 조회
+
+**Response:**
+```json
+{
+  "order": {
+    "id": "URB-XXXXX",
+    "status": "crafting",
+    "pickupCode": "7936",
+    "qrCode": "URB-XXXXX",
+    "pickupLocation": "B1층 Urban Fresh Zone",
+    "updatedAt": "2026-03-06T12:05:00.000Z"
+  }
+}
+```
+
+### PATCH `/api/orders/:orderId/status`
+주문 상태 업데이트 (Admin)
+
+**Request Body:**
+```json
+{
+  "status": "on_the_way"
+}
+```
+
+**Response:**
+```json
+{
+  "order": {
+    "id": "URB-XXXXX",
+    "status": "on_the_way",
+    "updatedAt": "2026-03-06T12:10:00.000Z"
+  }
 }
 ```
 
