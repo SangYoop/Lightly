@@ -112,6 +112,43 @@ const collectionsData = [
 // In-memory order storage (simulate database)
 const orders = new Map()
 
+// Mock order history for My Rhythm page
+const orderHistory = [
+  {
+    id: 'URB-20260305001',
+    date: '2026-03-05',
+    dateFormatted: '3월 5일',
+    collectionId: 'sharp',
+    collectionName: '01. Sharp',
+    spotId: 'dreamplus-gangnam',
+    spotName: '드림플러스 강남',
+    status: 'completed',
+    pickupTime: '11:30'
+  },
+  {
+    id: 'URB-20260304001',
+    date: '2026-03-04',
+    dateFormatted: '3월 4일',
+    collectionId: 'vital',
+    collectionName: '02. Vital',
+    spotId: 'dreamplus-gangnam',
+    spotName: '드림플러스 강남',
+    status: 'completed',
+    pickupTime: '11:30'
+  },
+  {
+    id: 'URB-20260303001',
+    date: '2026-03-03',
+    dateFormatted: '3월 3일',
+    collectionId: 'calm',
+    collectionName: '03. Calm',
+    spotId: 'kstc-yeoksam',
+    spotName: '한국과학기술회관 역삼',
+    status: 'completed',
+    pickupTime: '11:30'
+  }
+]
+
 // API: Get available spots
 app.get('/api/spots', (c) => {
   return c.json({ spots: spotsData })
@@ -189,6 +226,30 @@ app.patch('/api/orders/:orderId/status', async (c) => {
   orders.set(orderId, order)
   
   return c.json({ order })
+})
+
+// API: Get user order history
+app.get('/api/my-rhythm', (c) => {
+  // Mock current active order
+  const activeOrder = {
+    id: 'URB-CURRENT',
+    collectionId: 'sharp',
+    collectionName: '01. Sharp',
+    spotId: 'dreamplus-gangnam',
+    spotName: '드림플러스 강남',
+    status: 'crafting',
+    pickupTime: '11:30',
+    orderDate: new Date().toISOString()
+  }
+  
+  return c.json({
+    user: {
+      name: 'Urbanist',
+      totalOrders: orderHistory.length
+    },
+    activeOrder: activeOrder,
+    history: orderHistory
+  })
 })
 
 // Main page: Spot Selector (Mobile-First)
@@ -528,10 +589,19 @@ app.get('/dashboard', (c) => {
             <div class="px-6 pt-8 pb-4">
                 <div class="flex items-start justify-between">
                     <!-- Selected Spot -->
-                    <div>
+                    <div class="flex-1">
                         <div class="text-xs text-gray-500 mb-1 font-medium uppercase tracking-wider">Pickup at</div>
                         <h2 id="spotName" class="text-lg font-black">로딩 중...</h2>
                     </div>
+                    
+                    <!-- User Icon -->
+                    <a href="/my-rhythm" class="mr-3 mt-1">
+                        <div class="w-10 h-10 rounded-full border-2 border-gray-700 flex items-center justify-center hover:border-[#00FF85] transition-colors">
+                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                            </svg>
+                        </div>
+                    </a>
                     
                     <!-- Real-time Timer -->
                     <div class="text-right timer-pulse border-2 border-[#00FF85]/30 rounded-xl px-3 py-2">
@@ -970,6 +1040,192 @@ app.get('/order-success', (c) => {
         </div>
         
         <script src="/static/order-success.js"></script>
+    </body>
+    </html>
+  `)
+})
+
+// My Rhythm Page
+app.get('/my-rhythm', (c) => {
+  return c.html(`
+    <!DOCTYPE html>
+    <html lang="ko">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+        <meta name="theme-color" content="#1A1A1B">
+        <title>Urban Fresh - My Rhythm</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+                -webkit-tap-highlight-color: transparent;
+            }
+            
+            body {
+                font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+                background: #1A1A1B;
+                color: #F9FAFB;
+                min-height: 100vh;
+                overflow-x: hidden;
+            }
+            
+            .neo-mint {
+                color: #00FF85;
+            }
+            
+            .neo-mint-bg {
+                background: #00FF85;
+            }
+            
+            /* Active Order Card */
+            .active-order-card {
+                background: linear-gradient(135deg, rgba(0, 255, 133, 0.1), rgba(0, 255, 133, 0.05));
+                border: 2px solid rgba(0, 255, 133, 0.3);
+                animation: pulse-border 2s ease-in-out infinite;
+            }
+            
+            @keyframes pulse-border {
+                0%, 100% {
+                    border-color: rgba(0, 255, 133, 0.3);
+                }
+                50% {
+                    border-color: rgba(0, 255, 133, 0.6);
+                }
+            }
+            
+            /* History Card */
+            .history-card {
+                background: rgba(249, 250, 251, 0.04);
+                border: 2px solid rgba(249, 250, 251, 0.08);
+                transition: all 0.3s ease;
+            }
+            
+            .history-card:active {
+                transform: scale(0.98);
+                border-color: rgba(0, 255, 133, 0.3);
+            }
+            
+            /* Back Button */
+            .back-button {
+                transition: all 0.3s ease;
+            }
+            
+            .back-button:active {
+                transform: translateX(-4px);
+            }
+            
+            /* Status Badge */
+            .status-badge {
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                padding: 4px 12px;
+                border-radius: 20px;
+                font-size: 11px;
+                font-weight: 700;
+                letter-spacing: 0.5px;
+                text-transform: uppercase;
+            }
+            
+            .status-crafting {
+                background: rgba(0, 255, 133, 0.1);
+                color: #00FF85;
+                border: 1px solid rgba(0, 255, 133, 0.3);
+            }
+            
+            .status-completed {
+                background: rgba(249, 250, 251, 0.05);
+                color: #9CA3AF;
+                border: 1px solid rgba(249, 250, 251, 0.1);
+            }
+        </style>
+    </head>
+    <body>
+        <div class="min-h-screen">
+            
+            <!-- Header -->
+            <header class="px-6 pt-8 pb-6 border-b border-gray-800/50">
+                <div class="flex items-center justify-between mb-6">
+                    <a href="/dashboard" class="back-button">
+                        <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 19l-7-7 7-7"/>
+                        </svg>
+                    </a>
+                    <div class="text-xs text-gray-500 uppercase tracking-wider font-semibold">My Page</div>
+                </div>
+                
+                <div>
+                    <h1 class="text-3xl font-black mb-2">
+                        My <span class="neo-mint">Rhythm</span>
+                    </h1>
+                    <p class="text-sm text-gray-400 font-light">
+                        당신만의 리듬을 확인하세요
+                    </p>
+                </div>
+            </header>
+            
+            <!-- Main Content -->
+            <main class="px-6 py-8">
+                
+                <!-- User Info -->
+                <div class="mb-8">
+                    <div class="flex items-center gap-3 mb-2">
+                        <div class="w-12 h-12 rounded-full border-2 border-[#00FF85] flex items-center justify-center">
+                            <svg class="w-6 h-6 neo-mint" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h2 id="userName" class="text-xl font-black">Urbanist님</h2>
+                            <p class="text-xs text-gray-500"><span id="totalOrders">0</span>번의 웰니스를 선택하셨어요</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Active Order Card -->
+                <div id="activeOrderSection" class="mb-8" style="display: none;">
+                    <div class="text-xs text-gray-500 uppercase tracking-wider mb-3 font-semibold">Active Order</div>
+                    <div class="active-order-card rounded-2xl p-6">
+                        <div class="flex items-start justify-between mb-4">
+                            <div>
+                                <div class="text-lg font-black neo-mint mb-1" id="activeCollectionName">--</div>
+                                <div class="text-xs text-gray-400" id="activeSpotName">--</div>
+                            </div>
+                            <div class="status-badge status-crafting">
+                                <div class="w-2 h-2 rounded-full bg-[#00FF85]"></div>
+                                <span id="activeStatus">Crafting</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2 text-xs text-gray-400">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            <span>픽업 시간: <span id="activePickupTime" class="neo-mint font-semibold">--</span></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Order History -->
+                <div>
+                    <div class="text-xs text-gray-500 uppercase tracking-wider mb-3 font-semibold">Order History</div>
+                    <div class="space-y-3" id="historyContainer">
+                        <!-- Loading -->
+                        <div class="text-center py-12">
+                            <div class="inline-block w-8 h-8 border-4 border-gray-800 border-t-[#00FF85] rounded-full animate-spin"></div>
+                            <p class="mt-4 text-sm text-gray-500">히스토리 불러오는 중...</p>
+                        </div>
+                    </div>
+                </div>
+                
+            </main>
+            
+        </div>
+        
+        <script src="/static/my-rhythm.js"></script>
     </body>
     </html>
   `)
