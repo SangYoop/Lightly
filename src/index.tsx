@@ -97,26 +97,44 @@ app.get('/api/collections/:spotId', async (c) => {
     
     if (inventoryError) throw inventoryError
     
+    // Get supplements for each collection
+    const { data: supplements } = await supabase
+      .from('supplements')
+      .select('theme, title, nutrients')
+      .eq('is_active', true)
+    
+    // Theme mapping: name to number
+    const themeMap: Record<string, string> = {
+      'Sharp': '01',
+      'Vital': '02',
+      'Calm': '03'
+    }
+    
     // Transform to frontend format
-    const collections = inventory.map((item: any) => ({
-      id: item.collections.id,
-      number: item.collections.theme_no,
-      name: item.collections.title,
-      tagline: item.collections.tagline,
-      description: item.collections.description,
-      unitsLeft: item.remain_qty,
-      price: item.collections.price,
-      image: item.collections.image_url || `/static/images/${item.collections.id}.jpg`,
-      ingredients: item.collections.ingredients,
-      nutrition: {
-        calories: item.collections.calories,
-        protein: item.collections.protein_g,
-        carbs: item.collections.carbs_g,
-        fat: item.collections.fat_g
-      },
-      tags: item.collections.tags,
-      supplement: `이번 주 웰니스: 포함됨`
-    }))
+    const collections = inventory.map((item: any) => {
+      // Find supplement by matching theme name
+      const supplement = supplements?.find(s => themeMap[s.theme] === item.collections.theme_no)
+      
+      return {
+        id: item.collections.id,
+        number: item.collections.theme_no,
+        name: item.collections.title,
+        tagline: item.collections.tagline,
+        description: item.collections.description,
+        unitsLeft: item.remain_qty,
+        price: item.collections.price,
+        image: item.collections.image_url || `/static/images/${item.collections.id}.jpg`,
+        ingredients: item.collections.ingredients,
+        nutrition: {
+          calories: item.collections.calories,
+          protein: item.collections.protein_g,
+          carbs: item.collections.carbs_g,
+          fat: item.collections.fat_g
+        },
+        tags: item.collections.tags,
+        supplement: supplement ? `이번 주 웰니스: ${supplement.title}` : '이번 주 웰니스: 포함됨'
+      }
+    })
     
     const transformedSpot = {
       id: spot.id,
