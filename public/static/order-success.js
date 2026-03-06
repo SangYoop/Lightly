@@ -58,15 +58,20 @@
         // Load spot data first
         await loadSpotData();
         
-        // Set order meta info
-        if (confirmedCollectionId) {
-            menuName.textContent = collectionNames[confirmedCollectionId] || '--';
+        // Set order meta info with fallback
+        let collectionId = confirmedCollectionId || 'sharp'; // Default to Sharp for testing
+        
+        if (collectionId) {
+            menuName.textContent = collectionNames[collectionId] || '--';
         }
         
         if (spotData) {
             spotName.textContent = spotData.name;
             pickupTimeEl.textContent = spotData.pickupTime + ' AM';
         }
+        
+        // Pickup details modal setup (must be after spotData is loaded)
+        setupPickupDetailsModal();
         
         // Start polling for status updates (simulate real-time)
         if (orderId) {
@@ -82,8 +87,13 @@
     
     // Load spot data
     async function loadSpotData() {
-        const selectedSpotId = localStorage.getItem('selectedSpot');
-        if (!selectedSpotId) return;
+        let selectedSpotId = localStorage.getItem('selectedSpot');
+        
+        // Fallback to default spot for testing
+        if (!selectedSpotId) {
+            selectedSpotId = 'dreamplus-gangnam';
+            console.log('No selectedSpot in localStorage, using default:', selectedSpotId);
+        }
         
         try {
             const response = await fetch('/api/spots');
@@ -93,6 +103,7 @@
                 spotData = data.spots.find(function(s) {
                     return s.id === selectedSpotId;
                 });
+                console.log('Loaded spotData:', spotData);
             }
         } catch (error) {
             console.error('Failed to load spot data:', error);
