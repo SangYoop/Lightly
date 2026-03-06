@@ -792,16 +792,16 @@ app.get('/order-success', (c) => {
                         </div>
                         <div class="grid grid-cols-3 gap-4 text-center" id="orderMeta">
                             <div>
-                                <div class="text-2xl font-black neo-mint mb-1">15</div>
-                                <div class="text-xs text-gray-500">Minutes</div>
+                                <div class="text-sm font-black neo-mint mb-1" id="menuName">--</div>
+                                <div class="text-xs text-gray-500">MENU</div>
                             </div>
                             <div>
-                                <div class="text-2xl font-black mb-1">480g</div>
-                                <div class="text-xs text-gray-500">Protein</div>
+                                <div class="text-sm font-black mb-1" id="spotName">--</div>
+                                <div class="text-xs text-gray-500">SPOT</div>
                             </div>
                             <div>
-                                <div class="text-2xl font-black mb-1" id="collectionName">--</div>
-                                <div class="text-xs text-gray-500">Collection</div>
+                                <div class="text-sm font-black mb-1" id="pickupTime">--</div>
+                                <div class="text-xs text-gray-500">TIME</div>
                             </div>
                         </div>
                     </div>

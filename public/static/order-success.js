@@ -12,16 +12,25 @@
     }
     
     const collectionNames = {
-        'sharp': 'Sharp',
-        'vital': 'Vital',
-        'calm': 'Calm'
+        'sharp': '01. Sharp',
+        'vital': '02. Vital',
+        'calm': '03. Calm'
+    };
+    
+    const collectionNumbers = {
+        'sharp': '01',
+        'vital': '02',
+        'calm': '03'
     };
     
     let currentStatus = 'crafting';
     let pollInterval;
+    let spotData = null;
     
     // DOM Elements
-    const collectionName = document.getElementById('collectionName');
+    const menuName = document.getElementById('menuName');
+    const spotName = document.getElementById('spotName');
+    const pickupTimeEl = document.getElementById('pickupTime');
     const statusDots = {
         crafting: document.getElementById('statusCrafting'),
         onTheWay: document.getElementById('statusOnTheWay'),
@@ -39,10 +48,18 @@
     const nextStatusBtn = document.getElementById('nextStatusBtn');
     
     // Initialize
-    function init() {
-        // Set collection name
+    async function init() {
+        // Load spot data first
+        await loadSpotData();
+        
+        // Set order meta info
         if (confirmedCollectionId) {
-            collectionName.textContent = collectionNames[confirmedCollectionId] || '--';
+            menuName.textContent = collectionNames[confirmedCollectionId] || '--';
+        }
+        
+        if (spotData) {
+            spotName.textContent = spotData.name;
+            pickupTimeEl.textContent = spotData.pickupTime + ' AM';
         }
         
         // Start polling for status updates (simulate real-time)
@@ -55,6 +72,25 @@
         
         // Initial status update
         updateStatus('crafting');
+    }
+    
+    // Load spot data
+    async function loadSpotData() {
+        const selectedSpotId = localStorage.getItem('selectedSpot');
+        if (!selectedSpotId) return;
+        
+        try {
+            const response = await fetch('/api/spots');
+            const data = await response.json();
+            
+            if (data.spots) {
+                spotData = data.spots.find(function(s) {
+                    return s.id === selectedSpotId;
+                });
+            }
+        } catch (error) {
+            console.error('Failed to load spot data:', error);
+        }
     }
     
     // Simulate real-time subscription by polling
