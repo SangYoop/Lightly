@@ -786,15 +786,25 @@ app.get('/order-success', (c) => {
                 
                 <!-- Sub-text -->
                 <div class="fade-in-up-delay-1 mb-12">
-                    <p class="text-lg text-gray-300 font-light leading-relaxed mb-6">
-                        오늘 당신은<br>
-                        <span class="text-2xl font-semibold neo-mint">500g의 신선함</span>과<br>
-                        <span class="text-2xl font-semibold neo-mint">15분의 여유</span>를 선택했습니다.
+                    <p class="text-base text-gray-300 font-light leading-relaxed">
+                        바쁜 도심 속에서 찾아낸<br>
+                        오직 당신만을 위한 웰니스로<br>
+                        곧 찾아갈게요.
                     </p>
-                    <p class="text-sm text-gray-500 font-light leading-relaxed">
-                        이 조합은 오늘 당신의 오후를<br>
-                        가장 완벽하게 만들 것입니다.
-                    </p>
+                </div>
+                
+                <!-- Rhythm Note -->
+                <div class="fade-in-up-delay-1 mb-12">
+                    <div class="bg-gradient-to-br from-gray-900/40 to-gray-900/20 border border-gray-800/50 rounded-2xl p-6">
+                        <div class="text-xs text-gray-600 uppercase tracking-wider mb-3 font-semibold">
+                            Rhythm Note
+                        </div>
+                        <p class="text-sm text-gray-400 font-light leading-relaxed">
+                            번거로운 선택은 어반프레시가 대신했습니다.<br>
+                            당신은 그저 다가올 가장 맑은 시간을<br>
+                            즐기기만 하세요.
+                        </p>
+                    </div>
                 </div>
                 
                 <!-- Pulse Tracker -->

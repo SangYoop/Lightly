@@ -190,11 +190,22 @@
     // Pickup details modal setup
     function setupPickupDetailsModal() {
         if (!showPickupDetailsBtn || !pickupModal || !closeModalBtn || !modalBackdrop) {
+            console.error('Modal elements not found:', {
+                btn: !!showPickupDetailsBtn,
+                modal: !!pickupModal,
+                closeBtn: !!closeModalBtn,
+                backdrop: !!modalBackdrop
+            });
             return;
         }
         
+        console.log('Modal setup complete, spotData:', spotData);
+        
         showPickupDetailsBtn.addEventListener('click', function() {
+            console.log('Button clicked, spotData:', spotData);
+            
             if (!spotData || !spotData.pickupDetails) {
+                console.error('No spot data or pickupDetails:', spotData);
                 alert('픽업 위치 정보를 불러올 수 없습니다.');
                 return;
             }
@@ -204,6 +215,8 @@
             const modalDescription = document.getElementById('modalPickupDescription');
             const modalGuide = document.getElementById('modalPickupGuide');
             const modalSpotName = document.getElementById('modalSpotName');
+            
+            console.log('Populating modal with:', spotData.pickupDetails);
             
             if (modalSpotName) modalSpotName.textContent = spotData.name;
             if (modalImage) modalImage.src = spotData.pickupDetails.image;
