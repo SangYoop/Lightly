@@ -42,6 +42,12 @@
     const qrCodeDisplay = document.getElementById('qrCodeDisplay');
     const pickupLocation = document.getElementById('pickupLocation');
     
+    // Pickup details modal
+    const showPickupDetailsBtn = document.getElementById('showPickupDetailsBtn');
+    const pickupModal = document.getElementById('pickupModal');
+    const closeModalBtn = document.getElementById('closeModal');
+    const modalBackdrop = document.getElementById('modalBackdrop');
+    
     // Admin controls
     const adminPanel = document.getElementById('adminPanel');
     const adminStatus = document.getElementById('adminStatus');
@@ -179,6 +185,52 @@
         if (navigator.vibrate) {
             navigator.vibrate([100, 50, 100, 50, 100]);
         }
+    }
+    
+    // Pickup details modal setup
+    function setupPickupDetailsModal() {
+        if (!showPickupDetailsBtn || !pickupModal || !closeModalBtn || !modalBackdrop) {
+            return;
+        }
+        
+        showPickupDetailsBtn.addEventListener('click', function() {
+            if (!spotData || !spotData.pickupDetails) {
+                alert('픽업 위치 정보를 불러올 수 없습니다.');
+                return;
+            }
+            
+            // Populate modal with spot-specific data
+            const modalImage = document.getElementById('modalPickupImage');
+            const modalDescription = document.getElementById('modalPickupDescription');
+            const modalGuide = document.getElementById('modalPickupGuide');
+            const modalSpotName = document.getElementById('modalSpotName');
+            
+            if (modalSpotName) modalSpotName.textContent = spotData.name;
+            if (modalImage) modalImage.src = spotData.pickupDetails.image;
+            if (modalDescription) modalDescription.textContent = spotData.pickupDetails.description;
+            if (modalGuide) modalGuide.textContent = spotData.pickupDetails.guide;
+            
+            // Show modal
+            pickupModal.classList.add('open');
+            modalBackdrop.classList.add('open');
+            
+            // Prevent body scroll
+            document.body.style.overflow = 'hidden';
+            
+            // Haptic feedback
+            if (navigator.vibrate) {
+                navigator.vibrate(30);
+            }
+        });
+        
+        function closeModal() {
+            pickupModal.classList.remove('open');
+            modalBackdrop.classList.remove('open');
+            document.body.style.overflow = '';
+        }
+        
+        closeModalBtn.addEventListener('click', closeModal);
+        modalBackdrop.addEventListener('click', closeModal);
     }
     
     // Admin controls setup

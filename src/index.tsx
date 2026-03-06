@@ -21,7 +21,13 @@ const spotsData = [
     orderDeadline: '10:00',
     orderDeadlineISO: new Date(new Date().toDateString() + ' 10:00:00 GMT+0900').toISOString(),
     pickupTime: '11:30',
-    coordinates: { lat: 37.5012, lng: 127.0396 }
+    coordinates: { lat: 37.5012, lng: 127.0396 },
+    pickupDetails: {
+      location: 'B1층 로비',
+      description: '드림플러스 강남 B1층 로비, 엘리베이터 우측 어반프레시 전용 픽업 스테이션에 준비되어 있습니다.',
+      guide: '스마트 락커에 표시된 픽업 코드를 입력하시면 자동으로 문이 열립니다.',
+      image: '/static/images/pickup-dreamplus.jpg'
+    }
   },
   {
     id: 'kstc-yeoksam',
@@ -32,7 +38,13 @@ const spotsData = [
     orderDeadline: '10:00',
     orderDeadlineISO: new Date(new Date().toDateString() + ' 10:00:00 GMT+0900').toISOString(),
     pickupTime: '11:30',
-    coordinates: { lat: 37.4986, lng: 127.0329 }
+    coordinates: { lat: 37.4986, lng: 127.0329 },
+    pickupDetails: {
+      location: '1층 메인 로비',
+      description: '한국과학기술회관 1층 메인 로비 입구, 안내데스크 맞은편 어반프레시 전용 픽업 스테이션에 준비되어 있습니다.',
+      guide: '스마트 락커에 표시된 픽업 코드를 입력하시면 자동으로 문이 열립니다.',
+      image: '/static/images/pickup-kstc.jpg'
+    }
   }
 ]
 
@@ -701,6 +713,62 @@ app.get('/order-success', (c) => {
                 background: rgba(0, 255, 133, 0.05);
                 transform: scale(0.98);
             }
+            
+            /* Pickup Details Modal */
+            .pickup-modal {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                background: #1A1A1B;
+                border-top-left-radius: 32px;
+                border-top-right-radius: 32px;
+                transform: translateY(100%);
+                transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                z-index: 200;
+                max-height: 85vh;
+                overflow-y: auto;
+                box-shadow: 0 -20px 80px rgba(0, 0, 0, 0.8);
+            }
+            
+            .pickup-modal.open {
+                transform: translateY(0);
+            }
+            
+            .modal-backdrop {
+                position: fixed;
+                inset: 0;
+                background: rgba(0, 0, 0, 0.75);
+                opacity: 0;
+                pointer-events: none;
+                transition: opacity 0.4s;
+                z-index: 199;
+                backdrop-filter: blur(8px);
+                -webkit-backdrop-filter: blur(8px);
+            }
+            
+            .modal-backdrop.open {
+                opacity: 1;
+                pointer-events: auto;
+            }
+            
+            .modal-image-placeholder {
+                background: linear-gradient(135deg, rgba(0, 255, 133, 0.15), rgba(0, 255, 133, 0.05));
+                position: relative;
+                overflow: hidden;
+            }
+            
+            .modal-image-placeholder::after {
+                content: '📍 Pickup Zone';
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                color: rgba(249, 250, 251, 0.3);
+                font-size: 1.5rem;
+                font-weight: 900;
+                text-align: center;
+            }
         </style>
     </head>
     <body>
@@ -797,7 +865,14 @@ app.get('/order-success', (c) => {
                             </div>
                             <div>
                                 <div class="text-sm font-black mb-1" id="spotName">--</div>
-                                <div class="text-xs text-gray-500">SPOT</div>
+                                <div class="text-xs text-gray-500 mb-2">SPOT</div>
+                                <button id="showPickupDetailsBtn" class="text-xs neo-mint hover:underline font-semibold flex items-center justify-center gap-1 mx-auto">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                    </svg>
+                                    상세 위치
+                                </button>
                             </div>
                             <div>
                                 <div class="text-sm font-black mb-1" id="pickupTime">--</div>
@@ -828,6 +903,60 @@ app.get('/order-success', (c) => {
                 
             </div>
             
+        </div>
+        
+        <!-- Pickup Details Modal -->
+        <div class="modal-backdrop" id="modalBackdrop"></div>
+        <div class="pickup-modal" id="pickupModal">
+            <div class="sticky top-0 bg-[#1A1A1B] z-10 px-6 pt-6 pb-4 border-b border-gray-800">
+                <div class="w-12 h-1 bg-gray-700 rounded-full mx-auto mb-6"></div>
+                <button id="closeModal" class="text-gray-400 text-sm font-medium">✕ 닫기</button>
+            </div>
+            
+            <div class="px-6 py-8">
+                <!-- Spot Name Header -->
+                <div class="mb-6">
+                    <div class="text-xs text-gray-500 uppercase tracking-wider mb-2 font-semibold">Pickup Location</div>
+                    <h3 id="modalSpotName" class="text-2xl font-black neo-mint mb-2">--</h3>
+                </div>
+                
+                <!-- Image Section -->
+                <div class="mb-6">
+                    <div class="modal-image-placeholder aspect-video rounded-2xl mb-4 border-2 border-gray-800">
+                        <img id="modalPickupImage" src="" alt="Pickup Zone" class="w-full h-full object-cover rounded-2xl opacity-0" 
+                             onerror="this.style.display='none'" onload="this.style.opacity='1'">
+                    </div>
+                </div>
+                
+                <!-- Description Section -->
+                <div class="mb-6">
+                    <div class="flex items-start gap-3">
+                        <svg class="w-5 h-5 neo-mint mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        </svg>
+                        <div>
+                            <div class="text-xs text-gray-500 uppercase tracking-wider mb-1 font-semibold">상세 안내</div>
+                            <p id="modalPickupDescription" class="text-sm text-gray-300 font-light leading-relaxed">
+                                픽업 위치 정보를 불러오는 중...
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Guide Section -->
+                <div class="bg-gradient-to-br from-green-900/20 to-emerald-900/10 border border-[#00FF85]/20 rounded-xl p-4">
+                    <div class="flex items-start gap-3">
+                        <div class="text-2xl">🔐</div>
+                        <div>
+                            <div class="text-xs text-gray-500 uppercase tracking-wider mb-1 font-semibold">픽업 방법</div>
+                            <p id="modalPickupGuide" class="text-sm text-gray-300 font-light leading-relaxed">
+                                --
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
         
         <script src="/static/order-success.js"></script>
