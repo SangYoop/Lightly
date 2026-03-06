@@ -193,23 +193,28 @@
 
 ### 2️⃣ 메뉴 선택
 1. 선택한 거점 이름 표시
-2. 주문 마감까지 실시간 타이머 확인
-3. 3가지 컬렉션 중 선택 (Sharp, Vital, Calm)
+2. 주문 마감까지 실시간 타이머 확인 (10:00 AM)
+3. 3가지 컬렉션 중 선택 (Sharp, Vital, Calm - 각 ₩9,900)
 4. 카드 탭 → Drawer 슬라이드업
-5. 영양 정보, 재료 확인
-6. "Confirm & Reserve" 버튼 클릭
+5. 영양 정보, 재료, Weekly Wellness 건강기능식품 확인
+6. "Confirm & Reserve · ₩9,900" 버튼 클릭
 
 ### 3️⃣ 주문 확정
 1. "Connecting to the kitchen" 로딩 (2.5초)
 2. `/order-success` 이동
-3. "The Urban Standard" 헤드라인 페이드인
-4. 웰니스 메시지 표시 ("500g의 신선함과 15분의 여유")
-5. Pulse Tracker에서 "Crafting" 상태 확인
-6. Order Meta 확인 (MENU: 01. Sharp, SPOT: 드림플러스 강남, TIME: 11:30 AM)
-7. "상세 위치" 버튼 클릭 → Pickup Location Modal 확인
-8. (Admin 패널로 상태 변경 테스트 가능)
-9. "Arrived" 상태 → Digital Pickup Pass 표시
-10. "Keep My Rhythm" 클릭 → 홈으로
+3. **"The Urban Standard" 헤드라인 페이드인**
+4. **웰니스 메시지**: "바쁜 도심 속에서 찾아낸 오직 당신만을 위한 웰니스로 곧 찾아갈게요."
+5. **Rhythm Note**: "번거로운 선택은 어반프레시가 대신했습니다. 당신은 그저 다가올 가장 맑은 시간을 즐기기만 하세요."
+6. Pulse Tracker에서 "Crafting" 상태 확인
+7. Order Meta 확인 (MENU: 01. Sharp, SPOT: 드림플러스 강남, TIME: 11:30 AM)
+8. **"상세 위치" 버튼 클릭** → Pickup Location Modal 확인
+   - 거점 이름 (Neo-Mint)
+   - 픽업 존 이미지 placeholder
+   - 상세 설명 ("B1층 로비, 엘리베이터 우측...")
+   - 픽업 방법 ("스마트 락커에 표시된 픽업 코드...")
+9. (Admin 패널로 상태 변경 테스트 가능)
+10. "Arrived" 상태 → Neo-Mint flash + Digital Pickup Pass 표시
+11. "Keep My Rhythm" 클릭 → 홈으로
 
 ## 🛠️ Tech Stack
 - **Framework**: Hono (Cloudflare Workers/Pages)
