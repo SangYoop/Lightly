@@ -1,8 +1,14 @@
 import { Hono } from 'hono'
 import { serveStatic } from 'hono/cloudflare-workers'
 import { cors } from 'hono/cors'
+import { createSupabaseClient } from './lib/supabase'
 
-const app = new Hono()
+type Bindings = {
+  SUPABASE_URL: string
+  SUPABASE_ANON_KEY: string
+}
+
+const app = new Hono<{ Bindings: Bindings }>()
 
 // Enable CORS for API routes
 app.use('/api/*', cors())
@@ -149,107 +155,342 @@ const orderHistory = [
   }
 ]
 
-// API: Get available spots
-app.get('/api/spots', (c) => {
-  return c.json({ spots: spotsData })
-})
-
-// API: Get collections by spot
-app.get('/api/collections/:spotId', (c) => {
-  const spotId = c.req.param('spotId')
-  const spot = spotsData.find(s => s.id === spotId)
-  
-  if (!spot) {
-    return c.json({ error: 'Spot not found' }, 404)
+// API: Get available spots (Supabase)
+app.get('/api/spots', async (c) => {
+  try {
+    const supabase = createSupabaseClient(c.env)
+    
+    const { data: spots, error } = await supabase
+      .from('spots')
+      .select('*')
+      .eq('is_active', true)
+      .order('name')
+    
+    if (error) throw error
+    
+    // Transform DB format to frontend format
+    const transformedSpots = spots.map(spot => ({
+      id: spot.id,
+      name: spot.name,
+      address: spot.address,
+      district: spot.district,
+      status: 'open',
+      orderDeadline: spot.order_deadline,
+      orderDeadlineISO: new Date(new Date().toDateString() + ` ${spot.order_deadline}:00 GMT+0900`).toISOString(),
+      pickupTime: spot.pickup_time,
+      coordinates: spot.coordinates,
+      pickupDetails: {
+        location: spot.pickup_location,
+        description: spot.pickup_guide,
+        guide: '스마트 락커에 표시된 픽업 코드를 입력하시면 자동으로 문이 열립니다.',
+        image: spot.image_url || '/static/images/pickup-default.jpg'
+      }
+    }))
+    
+    return c.json({ spots: transformedSpots })
+  } catch (error) {
+    console.error('Failed to fetch spots:', error)
+    return c.json({ error: 'Failed to fetch spots' }, 500)
   }
-  
-  return c.json({ 
-    spot,
-    collections: collectionsData,
-    orderDeadline: spot.orderDeadlineISO,
-    pickupTime: spot.pickupTime
-  })
 })
 
-// API: Create order (simulate)
+// API: Get collections by spot (Supabase)
+app.get('/api/collections/:spotId', async (c) => {
+  try {
+    const spotId = c.req.param('spotId')
+    const supabase = createSupabaseClient(c.env)
+    
+    // Get spot
+    const { data: spot, error: spotError } = await supabase
+      .from('spots')
+      .select('*')
+      .eq('id', spotId)
+      .eq('is_active', true)
+      .single()
+    
+    if (spotError) {
+      return c.json({ error: 'Spot not found' }, 404)
+    }
+    
+    // Get collections with inventory
+    const { data: inventory, error: inventoryError } = await supabase
+      .from('inventory')
+      .select(`
+        remain_qty,
+        collections (
+          id,
+          theme_no,
+          title,
+          tagline,
+          description,
+          price,
+          calories,
+          protein_g,
+          carbs_g,
+          fat_g,
+          ingredients,
+          tags,
+          image_url
+        )
+      `)
+      .eq('spot_id', spotId)
+      .order('collections(theme_no)')
+    
+    if (inventoryError) throw inventoryError
+    
+    // Transform to frontend format
+    const collections = inventory.map((item: any) => ({
+      id: item.collections.id,
+      number: item.collections.theme_no,
+      name: item.collections.title,
+      tagline: item.collections.tagline,
+      description: item.collections.description,
+      unitsLeft: item.remain_qty,
+      price: item.collections.price,
+      image: item.collections.image_url || `/static/images/${item.collections.id}.jpg`,
+      ingredients: item.collections.ingredients,
+      nutrition: {
+        calories: item.collections.calories,
+        protein: item.collections.protein_g,
+        carbs: item.collections.carbs_g,
+        fat: item.collections.fat_g
+      },
+      tags: item.collections.tags,
+      supplement: `이번 주 웰니스: 포함됨`
+    }))
+    
+    const transformedSpot = {
+      id: spot.id,
+      name: spot.name,
+      address: spot.address,
+      district: spot.district,
+      status: 'open',
+      orderDeadline: spot.order_deadline,
+      orderDeadlineISO: new Date(new Date().toDateString() + ` ${spot.order_deadline}:00 GMT+0900`).toISOString(),
+      pickupTime: spot.pickup_time,
+      coordinates: spot.coordinates,
+      pickupDetails: {
+        location: spot.pickup_location,
+        description: spot.pickup_guide,
+        guide: '스마트 락커에 표시된 픽업 코드를 입력하시면 자동으로 문이 열립니다.',
+        image: spot.image_url || '/static/images/pickup-default.jpg'
+      }
+    }
+    
+    return c.json({ 
+      spot: transformedSpot,
+      collections,
+      orderDeadline: transformedSpot.orderDeadlineISO,
+      pickupTime: spot.pickup_time
+    })
+  } catch (error) {
+    console.error('Failed to fetch collections:', error)
+    return c.json({ error: 'Failed to fetch collections' }, 500)
+  }
+})
+
+// API: Create order (Supabase)
 app.post('/api/orders', async (c) => {
-  const body = await c.req.json()
-  const orderId = 'URB-' + Date.now().toString(36).toUpperCase()
-  
-  const order = {
-    id: orderId,
-    spotId: body.spotId || 'dreamplus-gangnam',
-    collectionId: body.collectionId,
-    status: 'crafting',
-    pickupCode: Math.floor(1000 + Math.random() * 9000).toString(),
-    qrCode: orderId,
-    createdAt: new Date().toISOString(),
-    pickupLocation: 'B1층 Urban Fresh Zone'
+  try {
+    const body = await c.req.json()
+    const supabase = createSupabaseClient(c.env)
+    
+    // Generate pickup code
+    const pickupCode = Math.floor(1000 + Math.random() * 9000).toString()
+    
+    // Get spot pickup location
+    const { data: spot } = await supabase
+      .from('spots')
+      .select('pickup_location')
+      .eq('id', body.spotId)
+      .single()
+    
+    // Create order (order_number is auto-generated by DB function)
+    const { data: order, error } = await supabase
+      .from('orders')
+      .insert({
+        user_id: null, // TODO: Replace with actual user ID from auth
+        spot_id: body.spotId,
+        collection_id: body.collectionId,
+        status: 'crafting',
+        pickup_code: pickupCode,
+        qr_code: `URB-QR-${Date.now()}`,
+        pickup_location: spot?.pickup_location || 'B1층 Urban Fresh Zone'
+      })
+      .select()
+      .single()
+    
+    if (error) throw error
+    
+    // Transform to frontend format
+    const transformedOrder = {
+      id: order.order_number,
+      spotId: order.spot_id,
+      collectionId: order.collection_id,
+      status: order.status,
+      pickupCode: order.pickup_code,
+      qrCode: order.qr_code,
+      createdAt: order.created_at,
+      pickupLocation: order.pickup_location
+    }
+    
+    return c.json({ order: transformedOrder })
+  } catch (error) {
+    console.error('Failed to create order:', error)
+    return c.json({ error: 'Failed to create order' }, 500)
   }
-  
-  orders.set(orderId, order)
-  
-  return c.json({ order })
 })
 
-// API: Get order status
-app.get('/api/orders/:orderId', (c) => {
-  const orderId = c.req.param('orderId')
-  const order = orders.get(orderId)
-  
-  if (!order) {
-    return c.json({ error: 'Order not found' }, 404)
+// API: Get order status (Supabase)
+app.get('/api/orders/:orderId', async (c) => {
+  try {
+    const orderId = c.req.param('orderId')
+    const supabase = createSupabaseClient(c.env)
+    
+    const { data: order, error } = await supabase
+      .from('orders')
+      .select(`
+        *,
+        spots (name, pickup_location),
+        collections (title, theme_no)
+      `)
+      .eq('order_number', orderId)
+      .single()
+    
+    if (error) {
+      return c.json({ error: 'Order not found' }, 404)
+    }
+    
+    // Transform to frontend format
+    const transformedOrder = {
+      id: order.order_number,
+      spotId: order.spot_id,
+      collectionId: order.collection_id,
+      status: order.status,
+      pickupCode: order.pickup_code,
+      qrCode: order.qr_code,
+      createdAt: order.created_at,
+      pickupLocation: order.pickup_location
+    }
+    
+    return c.json({ order: transformedOrder })
+  } catch (error) {
+    console.error('Failed to fetch order:', error)
+    return c.json({ error: 'Failed to fetch order' }, 500)
   }
-  
-  return c.json({ order })
 })
 
-// API: Update order status (Admin)
+// API: Update order status (Admin) (Supabase)
 app.patch('/api/orders/:orderId/status', async (c) => {
-  const orderId = c.req.param('orderId')
-  const order = orders.get(orderId)
-  
-  if (!order) {
-    return c.json({ error: 'Order not found' }, 404)
+  try {
+    const orderId = c.req.param('orderId')
+    const body = await c.req.json()
+    const newStatus = body.status
+    
+    if (!['crafting', 'on_the_way', 'arrived', 'completed', 'cancelled'].includes(newStatus)) {
+      return c.json({ error: 'Invalid status' }, 400)
+    }
+    
+    const supabase = createSupabaseClient(c.env)
+    
+    const { data: order, error } = await supabase
+      .from('orders')
+      .update({ status: newStatus })
+      .eq('order_number', orderId)
+      .select()
+      .single()
+    
+    if (error) {
+      return c.json({ error: 'Order not found' }, 404)
+    }
+    
+    return c.json({ 
+      order: {
+        id: order.order_number,
+        status: order.status,
+        updatedAt: order.updated_at
+      }
+    })
+  } catch (error) {
+    console.error('Failed to update order:', error)
+    return c.json({ error: 'Failed to update order' }, 500)
   }
-  
-  const body = await c.req.json()
-  const newStatus = body.status
-  
-  if (!['crafting', 'on_the_way', 'arrived'].includes(newStatus)) {
-    return c.json({ error: 'Invalid status' }, 400)
-  }
-  
-  order.status = newStatus
-  order.updatedAt = new Date().toISOString()
-  
-  orders.set(orderId, order)
-  
-  return c.json({ order })
 })
 
-// API: Get user order history
-app.get('/api/my-rhythm', (c) => {
-  // Mock current active order
-  const activeOrder = {
-    id: 'URB-CURRENT',
-    collectionId: 'sharp',
-    collectionName: '01. Sharp',
-    spotId: 'dreamplus-gangnam',
-    spotName: '드림플러스 강남',
-    status: 'crafting',
-    pickupTime: '11:30',
-    orderDate: new Date().toISOString()
+// API: Get user order history (Supabase)
+app.get('/api/my-rhythm', async (c) => {
+  try {
+    const supabase = createSupabaseClient(c.env)
+    const userId = null // TODO: Replace with actual user ID from auth
+    
+    // Get all user orders with spot and collection details
+    const { data: orders, error } = await supabase
+      .from('orders')
+      .select(`
+        order_number,
+        status,
+        created_at,
+        spots (
+          id,
+          name,
+          pickup_time
+        ),
+        collections (
+          id,
+          theme_no,
+          title
+        )
+      `)
+      .is('user_id', userId)
+      .order('created_at', { ascending: false })
+    
+    if (error) throw error
+    
+    // Separate active and completed orders
+    const activeOrders = orders.filter(o => ['crafting', 'on_the_way', 'arrived'].includes(o.status))
+    const completedOrders = orders.filter(o => o.status === 'completed')
+    
+    // Transform to frontend format
+    const activeOrder = activeOrders.length > 0 ? {
+      id: activeOrders[0].order_number,
+      collectionId: activeOrders[0].collections.id,
+      collectionName: `${activeOrders[0].collections.theme_no}. ${activeOrders[0].collections.title}`,
+      spotId: activeOrders[0].spots.id,
+      spotName: activeOrders[0].spots.name,
+      status: activeOrders[0].status,
+      pickupTime: activeOrders[0].spots.pickup_time,
+      orderDate: activeOrders[0].created_at
+    } : null
+    
+    const history = completedOrders.map(order => {
+      const orderDate = new Date(order.created_at)
+      const dateFormatted = `${orderDate.getMonth() + 1}월 ${orderDate.getDate()}일`
+      
+      return {
+        id: order.order_number,
+        date: orderDate.toISOString().split('T')[0],
+        dateFormatted,
+        collectionId: order.collections.id,
+        collectionName: `${order.collections.theme_no}. ${order.collections.title}`,
+        spotId: order.spots.id,
+        spotName: order.spots.name,
+        status: order.status,
+        pickupTime: order.spots.pickup_time
+      }
+    })
+    
+    return c.json({
+      user: {
+        name: 'Urbanist',
+        totalOrders: orders.length
+      },
+      activeOrder,
+      history
+    })
+  } catch (error) {
+    console.error('Failed to fetch user orders:', error)
+    return c.json({ error: 'Failed to fetch user orders' }, 500)
   }
-  
-  return c.json({
-    user: {
-      name: 'Urbanist',
-      totalOrders: orderHistory.length
-    },
-    activeOrder: activeOrder,
-    history: orderHistory
-  })
 })
 
 // Main page: Spot Selector (Mobile-First)
