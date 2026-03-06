@@ -92,6 +92,9 @@ const collectionsData = [
   }
 ]
 
+// In-memory order storage (simulate database)
+const orders = new Map()
+
 // API: Get available spots
 app.get('/api/spots', (c) => {
   return c.json({ spots: spotsData })
@@ -111,6 +114,63 @@ app.get('/api/collections/:spotId', (c) => {
     collections: collectionsData,
     orderDeadline: spot.orderDeadline
   })
+})
+
+// API: Create order (simulate)
+app.post('/api/orders', async (c) => {
+  const body = await c.req.json()
+  const orderId = 'URB-' + Date.now().toString(36).toUpperCase()
+  
+  const order = {
+    id: orderId,
+    spotId: body.spotId || 'dreamplus-gangnam',
+    collectionId: body.collectionId,
+    status: 'crafting',
+    pickupCode: Math.floor(1000 + Math.random() * 9000).toString(),
+    qrCode: orderId,
+    createdAt: new Date().toISOString(),
+    pickupLocation: 'B1층 Urban Fresh Zone'
+  }
+  
+  orders.set(orderId, order)
+  
+  return c.json({ order })
+})
+
+// API: Get order status
+app.get('/api/orders/:orderId', (c) => {
+  const orderId = c.req.param('orderId')
+  const order = orders.get(orderId)
+  
+  if (!order) {
+    return c.json({ error: 'Order not found' }, 404)
+  }
+  
+  return c.json({ order })
+})
+
+// API: Update order status (Admin)
+app.patch('/api/orders/:orderId/status', async (c) => {
+  const orderId = c.req.param('orderId')
+  const order = orders.get(orderId)
+  
+  if (!order) {
+    return c.json({ error: 'Order not found' }, 404)
+  }
+  
+  const body = await c.req.json()
+  const newStatus = body.status
+  
+  if (!['crafting', 'on_the_way', 'arrived'].includes(newStatus)) {
+    return c.json({ error: 'Invalid status' }, 400)
+  }
+  
+  order.status = newStatus
+  order.updatedAt = new Date().toISOString()
+  
+  orders.set(orderId, order)
+  
+  return c.json({ order })
 })
 
 // Main page: Spot Selector (Mobile-First)
@@ -667,22 +727,46 @@ app.get('/order-success', (c) => {
                     
                     <!-- Progress Line -->
                     <div class="pulse-line mb-6">
-                        <div class="pulse-progress pulse-wave"></div>
+                        <div class="pulse-progress pulse-wave" id="progressBar" style="width: 33.33%;"></div>
                     </div>
                     
                     <!-- Status Dots -->
                     <div class="flex justify-between items-center relative">
                         <div class="flex-1 text-center">
-                            <div class="pulse-dot active mx-auto mb-2"></div>
+                            <div class="pulse-dot active mx-auto mb-2" id="statusCrafting"></div>
                             <div class="text-xs font-semibold neo-mint">Crafting</div>
                         </div>
                         <div class="flex-1 text-center">
-                            <div class="pulse-dot mx-auto mb-2"></div>
+                            <div class="pulse-dot mx-auto mb-2" id="statusOnTheWay"></div>
                             <div class="text-xs text-gray-600">On the Way</div>
                         </div>
                         <div class="flex-1 text-center">
-                            <div class="pulse-dot mx-auto mb-2"></div>
+                            <div class="pulse-dot mx-auto mb-2" id="statusArrived"></div>
                             <div class="text-xs text-gray-600">Arrived</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Digital Pickup Pass (Hidden initially) -->
+                <div id="pickupPassCard" class="mb-12" style="display: none;">
+                    <div class="bg-gradient-to-br from-gray-900 to-black border-2 border-[#00FF85] rounded-3xl p-8 text-center">
+                        <div class="text-xs text-gray-500 uppercase tracking-wider mb-4 font-semibold">
+                            Digital Pickup Pass
+                        </div>
+                        <div class="mb-6">
+                            <div class="text-6xl font-black neo-mint mb-2" id="pickupCode">----</div>
+                            <div class="text-sm text-gray-400">픽업 코드</div>
+                        </div>
+                        <div class="mb-6 p-4 bg-white/5 rounded-xl">
+                            <div class="text-xs text-gray-500 mb-2" id="qrCodeDisplay">QR: --</div>
+                            <div class="text-xs text-gray-600">스마트 락커에서 스캔</div>
+                        </div>
+                        <div class="flex items-center justify-center gap-2 text-sm text-gray-400">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            </svg>
+                            <span id="pickupLocation">--</span>
                         </div>
                     </div>
                 </div>
@@ -711,7 +795,7 @@ app.get('/order-success', (c) => {
                 </div>
                 
                 <!-- Action Buttons -->
-                <div class="fade-in-up-delay-3 space-y-4">
+                <div class="fade-in-up-delay-3 space-y-4 mb-8">
                     <button class="btn-line-art w-full py-4 rounded-full text-sm font-semibold tracking-wide">
                         Add to My Calendar
                     </button>
@@ -720,30 +804,20 @@ app.get('/order-success', (c) => {
                     </button>
                 </div>
                 
+                <!-- Admin Simulator (Dev Only) -->
+                <div id="adminPanel" class="fixed bottom-4 right-4 bg-gray-900 border border-gray-700 rounded-xl p-4 text-xs opacity-50 hover:opacity-100 transition z-50">
+                    <div class="font-bold mb-2 text-gray-400">🔧 Admin Test</div>
+                    <div class="text-gray-500 mb-2">Status: <span id="adminStatus" class="text-[#00FF85]">CRAFTING</span></div>
+                    <button id="nextStatusBtn" class="w-full py-2 bg-gray-800 hover:bg-gray-700 rounded-lg text-white font-semibold">
+                        Next Status →
+                    </button>
+                </div>
+                
             </div>
             
         </div>
         
-        <script>
-            // Load confirmed collection data
-            const confirmedCollectionId = localStorage.getItem('confirmedCollection');
-            const collectionNames = {
-                'sharp': 'Sharp',
-                'vital': 'Vital',
-                'calm': 'Calm'
-            };
-            
-            if (confirmedCollectionId) {
-                document.getElementById('collectionName').textContent = collectionNames[confirmedCollectionId] || '--';
-            }
-            
-            // Haptic feedback on page load
-            if (navigator.vibrate) {
-                setTimeout(function() {
-                    navigator.vibrate([50, 100, 50]);
-                }, 500);
-            }
-        </script>
+        <script src="/static/order-success.js"></script>
     </body>
     </html>
   `)

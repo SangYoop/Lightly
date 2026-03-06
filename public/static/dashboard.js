@@ -236,16 +236,38 @@
     drawerBackdrop.addEventListener('click', closeDrawerFunc);
     
     // Confirm and Reserve (Checkout)
-    window.confirmAndReserve = function(collectionId) {
+    window.confirmAndReserve = async function(collectionId) {
         // Save selected collection
         localStorage.setItem('confirmedCollection', collectionId);
         
         // Close drawer
         closeDrawerFunc();
         
-        // Show connecting animation then redirect
+        // Show connecting animation
         showConnectingAnimation();
         
+        // Create order via API
+        try {
+            const response = await fetch('/api/orders', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    spotId: selectedSpotId,
+                    collectionId: collectionId
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (data.order) {
+                // Save order ID for status tracking
+                localStorage.setItem('currentOrderId', data.order.id);
+            }
+        } catch (error) {
+            console.error('Failed to create order:', error);
+        }
+        
+        // Redirect to success page
         setTimeout(function() {
             window.location.href = '/order-success';
         }, 2500);
