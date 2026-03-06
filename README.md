@@ -68,8 +68,14 @@
 ```
 
 ### Storage Services
-- **현재**: In-memory Array (하드코딩)
-- **계획**: Supabase PostgreSQL 마이그레이션 예정
+- **현재**: ✅ **Supabase PostgreSQL** (완전 연동 완료)
+- **데이터베이스**: 
+  - `spots` (거점 정보)
+  - `collections` (메뉴 컬렉션)
+  - `supplements` (Weekly Wellness 건강기능식품)
+  - `inventory` (거점별 재고 관리)
+  - `orders` (주문 내역)
+- **연동 상태**: 모든 API가 Supabase와 실시간 연동 중
 
 ## 🚀 완성된 3-Tap 플로우
 
@@ -174,10 +180,18 @@
 
 ✅ **마이페이지 (My Rhythm)**
 - User profile 표시
-- Active order tracking
-- Order history (Bento Grid)
+- Active order tracking (실시간 Supabase 연동)
+- Order history (Bento Grid, Supabase에서 조회)
 - Status badges
 - Dashboard에서 접근 가능
+
+✅ **Supabase 데이터베이스 연동 (완료)**
+- PostgreSQL 데이터베이스 설정 완료
+- 5개 테이블 (spots, collections, supplements, inventory, orders) 생성
+- 모든 API 엔드포인트 Supabase 연동 완료
+- RLS (Row Level Security) 정책 설정
+- 자동 order_number 생성 트리거
+- Seed 데이터 삽입 완료
 
 ✅ **데이터 정책**
 - 가격 정책: 모든 컬렉션 ₩9,900 고정
@@ -185,9 +199,8 @@
 - Weekly Wellness: 컬렉션별 건강기능식품 포함
 
 ## 🔄 Features Not Yet Implemented
-❌ Supabase 데이터베이스 연동 (현재 in-memory)
 ❌ 실제 결제 시스템 (PG 연동)  
-❌ 실제 사용자 인증/로그인
+❌ 실제 사용자 인증/로그인 (Supabase Auth)
 ❌ 주문 상세 보기 (History 클릭 시)
 ❌ 푸시 알림 (주문 상태 변경 시)
 ❌ 실제 이미지 업로드 (현재 플레이스홀더)  
@@ -198,15 +211,14 @@
 ❌ 프로필 편집 기능
 
 ## 🎯 Recommended Next Steps
-1. **Supabase 통합**: spots, collections, orders, users 테이블 생성 및 마이그레이션
-2. **사용자 인증**: Supabase Auth 연동 (이메일/소셜 로그인)
-3. **실시간 구독**: polling → Supabase Realtime 전환
-4. **실제 이미지**: 픽업 존 사진, 메뉴 이미지 업로드
-5. **주문 상세**: History 카드 클릭 시 상세 정보 모달
-6. **Cloudflare Pages 배포**: Production 환경 설정
-7. **GitHub 연동**: 소스 코드 저장소 설정
-8. **결제 연동**: PG사 (토스페이먼츠, 이니시스 등) 연동
-9. **관리자 패널**: 주문 관리, 재고 관리, 거점 관리  
+1. **사용자 인증**: Supabase Auth 연동 (이메일/소셜 로그인)
+2. **실시간 구독**: polling → Supabase Realtime 전환
+3. **실제 이미지**: 픽업 존 사진, 메뉴 이미지 업로드 (Cloudflare Images)
+4. **주문 상세**: History 카드 클릭 시 상세 정보 모달
+5. **Cloudflare Pages 배포**: Production 환경 설정
+6. **GitHub 연동**: 소스 코드 저장소 설정
+7. **결제 연동**: PG사 (토스페이먼츠, 이니시스 등) 연동
+8. **관리자 패널**: 주문 관리, 재고 관리, 거점 관리  
 
 ## 🎯 User Journey (완성)
 
@@ -265,19 +277,28 @@
 - **Styling**: Tailwind CSS (CDN)
 - **Runtime**: Cloudflare Workers
 - **Process Manager**: PM2
-- **Database**: Supabase (계획 중)
+- **Database**: ✅ Supabase PostgreSQL (연동 완료)
+- **ORM/Client**: @supabase/supabase-js
 
 ## 📁 Project Structure
 ```
 webapp/
 ├── src/
-│   └── index.tsx              # Hono 라우팅 + 모든 페이지
+│   ├── index.tsx              # Hono 라우팅 + 모든 페이지
+│   └── lib/
+│       └── supabase.ts        # Supabase 클라이언트 설정
 ├── public/
 │   └── static/
 │       ├── spot-selector.js   # Step 1 로직
 │       ├── dashboard.js       # Step 2 로직
 │       ├── order-success.js   # Step 3 로직 (Pulse Tracker, Modal)
 │       └── my-rhythm.js       # My Rhythm 페이지 로직
+├── supabase/
+│   ├── README.md              # Supabase 설정 가이드
+│   └── migrations/
+│       ├── 20260306_initial_schema.sql   # 스키마 생성
+│       └── 20260306_seed_data.sql        # 초기 데이터
+├── .dev.vars                  # 환경 변수 (로컬 개발)
 ├── ecosystem.config.cjs       # PM2 설정
 ├── wrangler.jsonc            # Cloudflare 설정
 ├── package.json              # 의존성 관리
@@ -301,28 +322,32 @@ pm2 logs urban-fresh --nostream
 # 포트 정리
 npm run clean-port
 
-# API 테스트
+# API 테스트 (Supabase 연동)
 curl http://localhost:3000/api/spots
-curl http://localhost:3000/api/collections/dreamplus-gangnam
+curl http://localhost:3000/api/collections/0491b305-fef6-4b7f-96ec-f9e628f8b0ef
+curl -X POST http://localhost:3000/api/orders \
+  -H "Content-Type: application/json" \
+  -d '{"spotId":"0491b305-fef6-4b7f-96ec-f9e628f8b0ef","collectionId":"ddf098f7-2cb7-436e-b60f-1e1479aa10a7"}'
+curl http://localhost:3000/api/my-rhythm
 ```
 
-## 📝 API Endpoints
+## 📝 API Endpoints (Supabase 연동 완료)
 
 ### GET `/api/spots`
-거점 리스트 조회
+거점 리스트 조회 (Supabase에서 실시간 조회)
 
 **Response:**
 ```json
 {
   "spots": [
     {
-      "id": "dreamplus-gangnam",
+      "id": "0491b305-fef6-4b7f-96ec-f9e628f8b0ef",
       "name": "드림플러스 강남",
       "address": "서울특별시 강남구 테헤란로 311",
       "district": "강남",
       "status": "open",
-      "orderDeadline": "10:00",
-      "pickupTime": "11:30",
+      "orderDeadline": "10:00:00",
+      "pickupTime": "11:30:00",
       "coordinates": { "lat": 37.5012, "lng": 127.0396 },
       "pickupDetails": {
         "location": "B1층 로비",
@@ -336,7 +361,7 @@ curl http://localhost:3000/api/collections/dreamplus-gangnam
 ```
 
 ### GET `/api/collections/:spotId`
-거점별 메뉴 컬렉션 조회
+거점별 메뉴 컬렉션 조회 (재고 정보 포함)
 
 **Response:**
 ```json
@@ -344,7 +369,7 @@ curl http://localhost:3000/api/collections/dreamplus-gangnam
   "spot": { ... },
   "collections": [
     {
-      "id": "sharp",
+      "id": "ddf098f7-2cb7-436e-b60f-1e1479aa10a7",
       "number": "01",
       "name": "Sharp",
       "tagline": "Focused Energy",
@@ -352,18 +377,86 @@ curl http://localhost:3000/api/collections/dreamplus-gangnam
       "price": 9900,
       "nutrition": { "calories": 520, "protein": 42, "carbs": 48, "fat": 18 },
       "tags": ["고단백", "저당"],
-      "supplement": "이번 주 웰니스: 활력 비타민 B 콤플렉스 스틱 1포"
+      "supplement": "이번 주 웰니스: 포함됨"
     }
   ],
   "orderDeadline": "2026-03-06T01:00:00.000Z",
-  "pickupTime": "11:30"
+  "pickupTime": "11:30:00"
 }
 ```
 
 ### POST `/api/orders`
-주문 생성
+주문 생성 (Supabase에 저장)
 
 **Request Body:**
+```json
+{
+  "spotId": "0491b305-fef6-4b7f-96ec-f9e628f8b0ef",
+  "collectionId": "ddf098f7-2cb7-436e-b60f-1e1479aa10a7"
+}
+```
+
+**Response:**
+```json
+{
+  "order": {
+    "id": "URB-EF0C9FDD",
+    "spotId": "0491b305-fef6-4b7f-96ec-f9e628f8b0ef",
+    "collectionId": "ddf098f7-2cb7-436e-b60f-1e1479aa10a7",
+    "status": "crafting",
+    "pickupCode": "1846",
+    "qrCode": "URB-QR-1772814433746",
+    "createdAt": "2026-03-06T16:27:13.885042+00:00",
+    "pickupLocation": "B1층 로비"
+  }
+}
+```
+
+### GET `/api/orders/:orderId`
+주문 상태 조회
+
+**Response:**
+```json
+{
+  "order": {
+    "id": "URB-EF0C9FDD",
+    "status": "crafting",
+    "pickupCode": "1846",
+    "qrCode": "URB-QR-1772814433746"
+  }
+}
+```
+
+### PATCH `/api/orders/:orderId/status`
+주문 상태 업데이트 (Admin)
+
+**Request Body:**
+```json
+{
+  "status": "on_the_way" // crafting | on_the_way | arrived | completed | cancelled
+}
+```
+
+### GET `/api/my-rhythm`
+사용자 주문 내역 (Active + History)
+
+**Response:**
+```json
+{
+  "user": {
+    "name": "Urbanist",
+    "totalOrders": 1
+  },
+  "activeOrder": {
+    "id": "URB-EF0C9FDD",
+    "collectionName": "01. Sharp",
+    "spotName": "드림플러스 강남",
+    "status": "crafting",
+    "pickupTime": "11:30:00"
+  },
+  "history": []
+}
+```
 ```json
 {
   "spotId": "dreamplus-gangnam",
