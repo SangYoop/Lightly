@@ -76,13 +76,21 @@ async function initializePayment() {
         // Load Toss Payments SDK v2
         // Check if SDK is loaded
         if (typeof TossPayments === 'undefined') {
-            throw new Error('Toss Payments SDK가 로드되지 않았습니다.');
+            throw new Error('Toss Payments SDK가 로드되지 않았습니다. 페이지를 새로고침하세요.');
         }
         
-        const tossPayments = TossPayments(paymentInfo.clientKey);
+        console.log('TossPayments SDK loaded:', typeof TossPayments);
         
-        // Request payment using SDK v2 method
-        tossPayments.requestPayment({
+        // Initialize Toss Payments
+        const tossPayments = TossPayments(paymentInfo.clientKey);
+        console.log('TossPayments initialized');
+        
+        // Initialize payment window (결제창)
+        const payment = tossPayments.payment();
+        console.log('Payment window initialized');
+        
+        // Request payment using Payment Window API
+        await payment.requestPayment({
             method: 'CARD', // 카드 결제
             amount: {
                 currency: 'KRW',
@@ -92,15 +100,8 @@ async function initializePayment() {
             orderName: paymentInfo.orderName,
             successUrl: window.location.origin + '/payment-success',
             failUrl: window.location.origin + '/payment-fail',
-            customerEmail: paymentInfo.customerEmail,
-            customerName: paymentInfo.customerName,
-            card: {
-                flowMode: 'DEFAULT' // Hosted payment window
-            }
-        }).catch(function(error) {
-            console.error('Payment request error:', error);
-            alert('결제 요청 중 오류가 발생했습니다: ' + error.message);
-            window.location.href = '/dashboard';
+            customerEmail: paymentInfo.customerEmail || 'customer@example.com',
+            customerName: paymentInfo.customerName || '고객'
         });
         
     } catch (error) {
