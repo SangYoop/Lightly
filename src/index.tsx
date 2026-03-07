@@ -1841,8 +1841,14 @@ app.get('/login', (c) => {
                                class="input-field w-full px-4 py-3 rounded-xl text-white"
                                placeholder="••••••••" required minlength="6">
                     </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">비밀번호 확인</label>
+                        <input type="password" id="signupPasswordConfirm" 
+                               class="input-field w-full px-4 py-3 rounded-xl text-white"
+                               placeholder="••••••••" required minlength="6">
+                    </div>
                     <div id="signupError" class="text-red-400 text-sm hidden"></div>
-                    <button type="submit" 
+                    <button type="submit" id="signupButton"
                             class="w-full py-4 bg-[#00FF85] text-[#1A1A1B] rounded-full font-black text-lg">
                         회원가입
                     </button>
@@ -1923,9 +1929,29 @@ app.get('/login', (c) => {
                 const name = document.getElementById('signupName').value;
                 const email = document.getElementById('signupEmail').value;
                 const password = document.getElementById('signupPassword').value;
+                const passwordConfirm = document.getElementById('signupPasswordConfirm').value;
                 const errorEl = document.getElementById('signupError');
+                const submitButton = document.getElementById('signupButton');
                 
                 errorEl.classList.add('hidden');
+                
+                // Validate password match
+                if (password !== passwordConfirm) {
+                    errorEl.textContent = '비밀번호가 일치하지 않습니다.';
+                    errorEl.classList.remove('hidden');
+                    return;
+                }
+                
+                // Validate password length
+                if (password.length < 6) {
+                    errorEl.textContent = '비밀번호는 최소 6자 이상이어야 합니다.';
+                    errorEl.classList.remove('hidden');
+                    return;
+                }
+                
+                // Disable button during request
+                submitButton.disabled = true;
+                submitButton.textContent = '처리 중...';
                 
                 try {
                     const response = await fetch('/api/auth/signup', {
@@ -1936,6 +1962,8 @@ app.get('/login', (c) => {
                     
                     const data = await response.json();
                     
+                    console.log('Signup response:', data);
+                    
                     if (data.session) {
                         // Save session
                         localStorage.setItem('urban_fresh_session', JSON.stringify(data.session));
@@ -1944,13 +1972,42 @@ app.get('/login', (c) => {
                         const redirectTo = localStorage.getItem('redirect_after_login') || '/';
                         localStorage.removeItem('redirect_after_login');
                         window.location.href = redirectTo;
+                    } else if (data.user && !data.session) {
+                        // Email confirmation required
+                        errorEl.textContent = '회원가입 완료! 이메일을 확인해주세요. (개발 환경에서는 자동 로그인됩니다)';
+                        errorEl.classList.remove('hidden');
+                        errorEl.classList.remove('text-red-400');
+                        errorEl.classList.add('text-[#00FF85]');
+                        
+                        // For development: redirect to login after 2 seconds
+                        setTimeout(() => {
+                            loginTab.click();
+                        }, 2000);
                     } else {
-                        errorEl.textContent = data.error || '회원가입에 실패했습니다.';
+                        // Show detailed error message
+                        let errorMessage = data.error || '회원가입에 실패했습니다.';
+                        
+                        // Friendly error messages
+                        if (errorMessage.includes('Email address')) {
+                            errorMessage = '이메일 형식이 올바르지 않습니다.';
+                        } else if (errorMessage.includes('already registered')) {
+                            errorMessage = '이미 등록된 이메일입니다.';
+                        } else if (errorMessage.includes('Password')) {
+                            errorMessage = '비밀번호 형식이 올바르지 않습니다.';
+                        } else if (errorMessage.includes('Email rate limit')) {
+                            errorMessage = '너무 많은 요청이 발생했습니다. 잠시 후 다시 시도해주세요.';
+                        }
+                        
+                        errorEl.textContent = errorMessage;
                         errorEl.classList.remove('hidden');
                     }
                 } catch (error) {
-                    errorEl.textContent = '네트워크 오류가 발생했습니다.';
+                    console.error('Signup error:', error);
+                    errorEl.textContent = '네트워크 오류가 발생했습니다: ' + error.message;
                     errorEl.classList.remove('hidden');
+                } finally {
+                    submitButton.disabled = false;
+                    submitButton.textContent = '회원가입';
                 }
             });
         </script>
