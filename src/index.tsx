@@ -1459,4 +1459,240 @@ app.get('/my-rhythm', (c) => {
   `)
 })
 
+// Login/Signup Page
+app.get('/login', (c) => {
+  return c.html(`
+    <!DOCTYPE html>
+    <html lang="ko">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+        <meta name="theme-color" content="#1A1A1B">
+        <title>Urban Fresh - Login</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+                -webkit-tap-highlight-color: transparent;
+            }
+            
+            body {
+                font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+                background: #1A1A1B;
+                color: #F9FAFB;
+                -webkit-font-smoothing: antialiased;
+            }
+            
+            .neo-mint {
+                color: #00FF85;
+            }
+            
+            .neo-mint-bg {
+                background: #00FF85;
+            }
+            
+            .input-field {
+                background: rgba(249, 250, 251, 0.04);
+                border: 2px solid rgba(249, 250, 251, 0.1);
+                transition: all 0.2s;
+            }
+            
+            .input-field:focus {
+                background: rgba(249, 250, 251, 0.06);
+                border-color: #00FF85;
+                outline: none;
+            }
+            
+            .tab-button {
+                padding: 12px 24px;
+                border-bottom: 2px solid transparent;
+                transition: all 0.2s;
+                color: #6B7280;
+            }
+            
+            .tab-button.active {
+                color: #00FF85;
+                border-bottom-color: #00FF85;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="min-h-screen flex flex-col items-center justify-center px-6 py-12">
+            <div class="max-w-md w-full">
+                <!-- Logo/Header -->
+                <div class="text-center mb-12">
+                    <h1 class="text-5xl font-black mb-3">
+                        Urban<br><span class="neo-mint">Fresh</span>
+                    </h1>
+                    <p class="text-sm text-gray-400">프리미엄 오피스 웰니스 딜리버리</p>
+                </div>
+                
+                <!-- Tabs -->
+                <div class="flex border-b border-gray-800 mb-8">
+                    <button class="tab-button active flex-1" id="loginTab">로그인</button>
+                    <button class="tab-button flex-1" id="signupTab">회원가입</button>
+                </div>
+                
+                <!-- Login Form -->
+                <form id="loginForm" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-2">이메일</label>
+                        <input type="email" id="loginEmail" 
+                               class="input-field w-full px-4 py-3 rounded-xl text-white"
+                               placeholder="your@email.com" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">비밀번호</label>
+                        <input type="password" id="loginPassword" 
+                               class="input-field w-full px-4 py-3 rounded-xl text-white"
+                               placeholder="••••••••" required>
+                    </div>
+                    <div id="loginError" class="text-red-400 text-sm hidden"></div>
+                    <button type="submit" 
+                            class="w-full py-4 bg-[#00FF85] text-[#1A1A1B] rounded-full font-black text-lg">
+                        로그인
+                    </button>
+                </form>
+                
+                <!-- Signup Form (Hidden) -->
+                <form id="signupForm" class="space-y-4 hidden">
+                    <div>
+                        <label class="block text-sm font-medium mb-2">이름</label>
+                        <input type="text" id="signupName" 
+                               class="input-field w-full px-4 py-3 rounded-xl text-white"
+                               placeholder="홍길동" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">이메일</label>
+                        <input type="email" id="signupEmail" 
+                               class="input-field w-full px-4 py-3 rounded-xl text-white"
+                               placeholder="your@email.com" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">비밀번호 (최소 6자)</label>
+                        <input type="password" id="signupPassword" 
+                               class="input-field w-full px-4 py-3 rounded-xl text-white"
+                               placeholder="••••••••" required minlength="6">
+                    </div>
+                    <div id="signupError" class="text-red-400 text-sm hidden"></div>
+                    <button type="submit" 
+                            class="w-full py-4 bg-[#00FF85] text-[#1A1A1B] rounded-full font-black text-lg">
+                        회원가입
+                    </button>
+                </form>
+                
+                <!-- Back to Home -->
+                <div class="text-center mt-8">
+                    <a href="/" class="text-sm text-gray-500 hover:text-[#00FF85] transition-colors">
+                        ← 홈으로 돌아가기
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <script src="/static/auth.js"></script>
+        <script>
+            // Tab switching
+            const loginTab = document.getElementById('loginTab');
+            const signupTab = document.getElementById('signupTab');
+            const loginForm = document.getElementById('loginForm');
+            const signupForm = document.getElementById('signupForm');
+            
+            loginTab.addEventListener('click', function() {
+                loginTab.classList.add('active');
+                signupTab.classList.remove('active');
+                loginForm.classList.remove('hidden');
+                signupForm.classList.add('hidden');
+            });
+            
+            signupTab.addEventListener('click', function() {
+                signupTab.classList.add('active');
+                loginTab.classList.remove('active');
+                signupForm.classList.remove('hidden');
+                loginForm.classList.add('hidden');
+            });
+            
+            // Login form submission
+            loginForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const email = document.getElementById('loginEmail').value;
+                const password = document.getElementById('loginPassword').value;
+                const errorEl = document.getElementById('loginError');
+                
+                errorEl.classList.add('hidden');
+                
+                try {
+                    const response = await fetch('/api/auth/login', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email, password })
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data.session) {
+                        // Save session
+                        localStorage.setItem('urban_fresh_session', JSON.stringify(data.session));
+                        
+                        // Redirect
+                        const redirectTo = localStorage.getItem('redirect_after_login') || '/';
+                        localStorage.removeItem('redirect_after_login');
+                        window.location.href = redirectTo;
+                    } else {
+                        errorEl.textContent = data.error || '로그인에 실패했습니다.';
+                        errorEl.classList.remove('hidden');
+                    }
+                } catch (error) {
+                    errorEl.textContent = '네트워크 오류가 발생했습니다.';
+                    errorEl.classList.remove('hidden');
+                }
+            });
+            
+            // Signup form submission
+            signupForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const name = document.getElementById('signupName').value;
+                const email = document.getElementById('signupEmail').value;
+                const password = document.getElementById('signupPassword').value;
+                const errorEl = document.getElementById('signupError');
+                
+                errorEl.classList.add('hidden');
+                
+                try {
+                    const response = await fetch('/api/auth/signup', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email, password, name })
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data.session) {
+                        // Save session
+                        localStorage.setItem('urban_fresh_session', JSON.stringify(data.session));
+                        
+                        // Redirect
+                        const redirectTo = localStorage.getItem('redirect_after_login') || '/';
+                        localStorage.removeItem('redirect_after_login');
+                        window.location.href = redirectTo;
+                    } else {
+                        errorEl.textContent = data.error || '회원가입에 실패했습니다.';
+                        errorEl.classList.remove('hidden');
+                    }
+                } catch (error) {
+                    errorEl.textContent = '네트워크 오류가 발생했습니다.';
+                    errorEl.classList.remove('hidden');
+                }
+            });
+        </script>
+    </body>
+    </html>
+  `)
+})
+
 export default app
