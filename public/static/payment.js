@@ -1,5 +1,5 @@
-// Toss Payments Integration
-// Reference: https://docs.tosspayments.com/guides/payment-widget/integration
+// Toss Payments Widget Integration (SDK v2)
+// Reference: https://docs.tosspayments.com/sdk/v2/js#토스페이먼츠-초기화하기
 
 // Initialize payment on page load
 async function initializePayment() {
@@ -40,7 +40,7 @@ async function initializePayment() {
         const orderData = await orderResponse.json();
         
         if (!orderData.order) {
-            throw new Error('주문 생성 실패');
+            throw new Error('주문 생성 실패: ' + JSON.stringify(orderData));
         }
         
         const orderId = orderData.order.id;
@@ -63,17 +63,32 @@ async function initializePayment() {
         
         const paymentInfo = await paymentResponse.json();
         
-        // Load Toss Payments Widget
-        const tossPayments = window.TossPayments(paymentInfo.clientKey);
+        if (!paymentInfo.clientKey) {
+            throw new Error('결제 정보를 가져오지 못했습니다: ' + JSON.stringify(paymentInfo));
+        }
         
-        // Request payment
-        tossPayments.requestPayment('카드', {
-            amount: paymentInfo.amount,
+        console.log('Payment initialized:', {
+            orderId,
+            amount,
+            customerName: paymentInfo.customerName
+        });
+        
+        // Load Toss Payments SDK v2
+        const tossPayments = TossPayments(paymentInfo.clientKey);
+        
+        // Request payment using SDK v2 method
+        await tossPayments.requestPayment({
+            method: 'CARD', // 카드 결제
+            amount: {
+                currency: 'KRW',
+                value: paymentInfo.amount
+            },
             orderId: paymentInfo.orderId,
             orderName: paymentInfo.orderName,
-            customerName: paymentInfo.customerName,
             successUrl: window.location.origin + '/payment-success',
-            failUrl: window.location.origin + '/payment-fail'
+            failUrl: window.location.origin + '/payment-fail',
+            customerEmail: paymentInfo.customerEmail,
+            customerName: paymentInfo.customerName
         });
         
     } catch (error) {
