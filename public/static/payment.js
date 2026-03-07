@@ -1,5 +1,5 @@
-// Toss Payments Widget Integration (SDK v2)
-// Reference: https://docs.tosspayments.com/sdk/v2/js#토스페이먼츠-초기화하기
+// Toss Payments SDK v2 Integration
+// Reference: https://docs.tosspayments.com/sdk/v2/js
 
 // Initialize payment on page load
 async function initializePayment() {
@@ -74,10 +74,15 @@ async function initializePayment() {
         });
         
         // Load Toss Payments SDK v2
+        // Check if SDK is loaded
+        if (typeof TossPayments === 'undefined') {
+            throw new Error('Toss Payments SDK가 로드되지 않았습니다.');
+        }
+        
         const tossPayments = TossPayments(paymentInfo.clientKey);
         
         // Request payment using SDK v2 method
-        await tossPayments.requestPayment({
+        tossPayments.requestPayment({
             method: 'CARD', // 카드 결제
             amount: {
                 currency: 'KRW',
@@ -88,7 +93,14 @@ async function initializePayment() {
             successUrl: window.location.origin + '/payment-success',
             failUrl: window.location.origin + '/payment-fail',
             customerEmail: paymentInfo.customerEmail,
-            customerName: paymentInfo.customerName
+            customerName: paymentInfo.customerName,
+            card: {
+                flowMode: 'DEFAULT' // Hosted payment window
+            }
+        }).catch(function(error) {
+            console.error('Payment request error:', error);
+            alert('결제 요청 중 오류가 발생했습니다: ' + error.message);
+            window.location.href = '/dashboard';
         });
         
     } catch (error) {

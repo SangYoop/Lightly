@@ -1585,7 +1585,7 @@ app.get('/payment', (c) => {
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Urban Fresh - Payment</title>
         <script src="https://cdn.tailwindcss.com"></script>
-        <script src="https://js.tosspayments.com/v2/standard"></script>
+        <script src="https://js.tosspayments.com/v2"></script>
         <style>
             body {
                 font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
