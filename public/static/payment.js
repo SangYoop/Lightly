@@ -1,5 +1,5 @@
-// Toss Payments SDK v2 Integration
-// Reference: https://docs.tosspayments.com/sdk/v2/js
+// Toss Payments SDK v1 Integration (Payment Window)
+// Reference: https://docs.tosspayments.com/reference#tosspayments-객체
 
 console.log('🚀 Payment script loaded');
 console.log('Current URL:', window.location.href);
@@ -128,36 +128,39 @@ async function initializePayment() {
             customerName: paymentInfo.customerName
         });
         
-        // Load Toss Payments SDK v2
+        // Initialize Toss Payments SDK v1
         // Check if SDK is loaded
         if (typeof TossPayments === 'undefined') {
             throw new Error('Toss Payments SDK가 로드되지 않았습니다. 페이지를 새로고침하세요.');
         }
         
-        console.log('TossPayments SDK loaded:', typeof TossPayments);
+        console.log('✓ TossPayments SDK loaded:', typeof TossPayments);
         
         // Initialize Toss Payments
         const tossPayments = TossPayments(paymentInfo.clientKey);
-        console.log('TossPayments initialized');
+        console.log('✓ TossPayments initialized');
         
-        // Initialize payment window (결제창)
-        const payment = tossPayments.payment();
-        console.log('Payment window initialized');
-        
-        // Request payment using Payment Window API
-        await payment.requestPayment({
-            method: 'CARD', // 카드 결제
-            amount: {
-                currency: 'KRW',
-                value: paymentInfo.amount
-            },
+        // Request payment using v1 requestPayment API
+        // Reference: https://docs.tosspayments.com/reference#tosspayments-requestpayment
+        tossPayments.requestPayment('카드', {
+            amount: paymentInfo.amount,
             orderId: paymentInfo.orderId,
             orderName: paymentInfo.orderName,
+            customerName: paymentInfo.customerName || '고객',
             successUrl: window.location.origin + '/payment-success',
             failUrl: window.location.origin + '/payment-fail',
-            customerEmail: paymentInfo.customerEmail || 'customer@example.com',
-            customerName: paymentInfo.customerName || '고객'
+        }).catch(function(error) {
+            if (error.code === 'USER_CANCEL') {
+                console.log('사용자가 결제를 취소했습니다.');
+                window.location.href = '/dashboard';
+            } else {
+                console.error('❌ Payment request failed:', error);
+                alert('결제 요청 중 오류가 발생했습니다: ' + error.message);
+                window.location.href = '/dashboard';
+            }
         });
+        
+        console.log('✓ Payment request sent');
         
     } catch (error) {
         console.error('Payment initialization failed:', error);

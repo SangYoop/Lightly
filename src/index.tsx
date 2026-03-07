@@ -1599,7 +1599,8 @@ app.get('/payment', (c) => {
             <p class="text-gray-400">결제를 준비하고 있습니다...</p>
         </div>
         <!-- Load Toss Payments SDK first, then our script -->
-        <script src="https://js.tosspayments.com/v2" onload="console.log('Toss SDK loaded')" onerror="console.error('Toss SDK failed to load')"></script>
+        <!-- Using v1 SDK which supports payment window (결제창) -->
+        <script src="https://js.tosspayments.com/v1/payment" onload="console.log('Toss SDK v1 loaded')" onerror="console.error('Toss SDK failed to load')"></script>
         <script src="/static/payment.js" defer></script>
     </body>
     </html>
