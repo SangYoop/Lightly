@@ -1,6 +1,10 @@
 // Toss Payments SDK v2 Integration
 // Reference: https://docs.tosspayments.com/sdk/v2/js
 
+console.log('🚀 Payment script loaded');
+console.log('Current URL:', window.location.href);
+console.log('URL params:', window.location.search);
+
 // Wait for TossPayments SDK to load
 function waitForTossPayments() {
     return new Promise((resolve, reject) => {
@@ -30,8 +34,11 @@ function waitForTossPayments() {
 
 // Initialize payment on page load
 async function initializePayment() {
+    console.log('📝 initializePayment() called');
+    
     try {
         // Wait for SDK to load first
+        console.log('⏳ Waiting for TossPayments SDK...');
         await waitForTossPayments();
         console.log('✓ Toss Payments SDK loaded successfully');
     } catch (error) {
@@ -40,19 +47,25 @@ async function initializePayment() {
         return;
     }
     // Get order info from URL params
+    console.log('📋 Getting order info from URL params...');
     const params = new URLSearchParams(window.location.search);
     const collectionId = params.get('collectionId');
     const spotId = params.get('spotId');
+    console.log('Order info:', { collectionId, spotId });
     
     if (!collectionId || !spotId) {
+        console.error('❌ Missing order info');
         alert('주문 정보가 없습니다.');
         window.location.href = '/dashboard';
         return;
     }
     
     // Get auth session
+    console.log('🔐 Checking authentication...');
     const session = JSON.parse(localStorage.getItem('urban_fresh_session') || 'null');
+    console.log('Session:', session ? 'Found' : 'Not found');
     if (!session || !session.access_token) {
+        console.error('❌ Not authenticated');
         alert('로그인이 필요합니다.');
         localStorage.setItem('redirect_after_login', window.location.href);
         window.location.href = '/login';
@@ -61,6 +74,7 @@ async function initializePayment() {
     
     try {
         // Create order first (without payment)
+        console.log('📦 Creating order...');
         const orderResponse = await fetch('/api/orders', {
             method: 'POST',
             headers: {
@@ -74,8 +88,10 @@ async function initializePayment() {
         });
         
         const orderData = await orderResponse.json();
+        console.log('Order response:', orderData);
         
         if (!orderData.order) {
+            console.error('❌ Order creation failed:', orderData);
             throw new Error('주문 생성 실패: ' + JSON.stringify(orderData));
         }
         
@@ -84,6 +100,7 @@ async function initializePayment() {
         const orderName = 'Urban Fresh Collection';
         
         // Request payment info
+        console.log('💳 Requesting payment info...');
         const paymentResponse = await fetch('/api/payment/request', {
             method: 'POST',
             headers: {
@@ -98,8 +115,10 @@ async function initializePayment() {
         });
         
         const paymentInfo = await paymentResponse.json();
+        console.log('Payment info:', paymentInfo);
         
         if (!paymentInfo.clientKey) {
+            console.error('❌ No client key in payment info');
             throw new Error('결제 정보를 가져오지 못했습니다: ' + JSON.stringify(paymentInfo));
         }
         
