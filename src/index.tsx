@@ -736,7 +736,6 @@ app.get('/', (c) => {
                 
                 <div class="flex items-center justify-between mb-8">
                     <div class="text-xs text-gray-500 tracking-widest uppercase font-semibold">Step 1 of 3</div>
-                    <div class="text-xs text-gray-500 font-medium">Urban Fresh</div>
                 </div>
                 <h1 class="main-title mb-4">
                     Pick<br>Your<br><span class="neo-mint">Spot</span>
