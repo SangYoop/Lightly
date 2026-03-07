@@ -1,8 +1,44 @@
 // Toss Payments SDK v2 Integration
 // Reference: https://docs.tosspayments.com/sdk/v2/js
 
+// Wait for TossPayments SDK to load
+function waitForTossPayments() {
+    return new Promise((resolve, reject) => {
+        // Check if already loaded
+        if (typeof TossPayments !== 'undefined') {
+            resolve();
+            return;
+        }
+        
+        // Wait up to 10 seconds
+        let attempts = 0;
+        const maxAttempts = 100; // 10 seconds (100 * 100ms)
+        
+        const checkInterval = setInterval(() => {
+            attempts++;
+            
+            if (typeof TossPayments !== 'undefined') {
+                clearInterval(checkInterval);
+                resolve();
+            } else if (attempts >= maxAttempts) {
+                clearInterval(checkInterval);
+                reject(new Error('Toss Payments SDK 로드 시간 초과'));
+            }
+        }, 100);
+    });
+}
+
 // Initialize payment on page load
 async function initializePayment() {
+    try {
+        // Wait for SDK to load first
+        await waitForTossPayments();
+        console.log('✓ Toss Payments SDK loaded successfully');
+    } catch (error) {
+        console.error('SDK loading failed:', error);
+        alert('결제 시스템을 불러오는 중 오류가 발생했습니다. 페이지를 새로고침해주세요.');
+        return;
+    }
     // Get order info from URL params
     const params = new URLSearchParams(window.location.search);
     const collectionId = params.get('collectionId');

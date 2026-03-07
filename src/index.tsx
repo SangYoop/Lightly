@@ -1585,7 +1585,6 @@ app.get('/payment', (c) => {
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Urban Fresh - Payment</title>
         <script src="https://cdn.tailwindcss.com"></script>
-        <script src="https://js.tosspayments.com/v2"></script>
         <style>
             body {
                 font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -1599,7 +1598,9 @@ app.get('/payment', (c) => {
             <div class="animate-spin w-12 h-12 border-4 border-gray-800 border-t-[#00FF85] rounded-full mx-auto mb-4"></div>
             <p class="text-gray-400">결제를 준비하고 있습니다...</p>
         </div>
-        <script src="/static/payment.js"></script>
+        <!-- Load Toss Payments SDK first, then our script -->
+        <script src="https://js.tosspayments.com/v2" onload="console.log('Toss SDK loaded')" onerror="console.error('Toss SDK failed to load')"></script>
+        <script src="/static/payment.js" defer></script>
     </body>
     </html>
   `)
