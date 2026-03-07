@@ -258,57 +258,19 @@
         // Close drawer
         closeDrawerFunc();
         
-        // Show connecting animation
-        showConnectingAnimation();
+        // Check auth
+        const session = JSON.parse(localStorage.getItem('urban_fresh_session') || 'null');
         
-        // Create order via API
-        try {
-            // Get auth token
-            const session = JSON.parse(localStorage.getItem('urban_fresh_session') || 'null');
-            
-            if (!session || !session.access_token) {
-                // Not authenticated, redirect to login
-                alert('로그인이 필요합니다.');
-                localStorage.setItem('redirect_after_login', '/dashboard');
-                window.location.href = '/login';
-                return;
-            }
-            
-            const response = await fetch('/api/orders', {
-                method: 'POST',
-                headers: { 
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + session.access_token
-                },
-                body: JSON.stringify({
-                    spotId: selectedSpotId,
-                    collectionId: collectionId
-                })
-            });
-            
-            const data = await response.json();
-            
-            if (response.status === 401) {
-                // Auth failed, redirect to login
-                alert('로그인이 필요합니다.');
-                localStorage.setItem('redirect_after_login', '/dashboard');
-                window.location.href = '/login';
-                return;
-            }
-            
-            if (data.order) {
-                // Save order ID for status tracking
-                localStorage.setItem('currentOrderId', data.order.id);
-            }
-        } catch (error) {
-            alert('주문 생성 중 오류가 발생했습니다.');
+        if (!session || !session.access_token) {
+            // Not authenticated, redirect to login
+            alert('로그인이 필요합니다.');
+            localStorage.setItem('redirect_after_login', '/dashboard');
+            window.location.href = '/login';
             return;
         }
         
-        // Redirect to success page
-        setTimeout(function() {
-            window.location.href = '/order-success';
-        }, 2500);
+        // Redirect to payment page
+        window.location.href = `/payment?spotId=${selectedSpotId}&collectionId=${collectionId}`;
     };
     
     // Show connecting animation

@@ -7,6 +7,8 @@ import { getUser } from './lib/auth'
 type Bindings = {
   SUPABASE_URL: string
   SUPABASE_ANON_KEY: string
+  TOSS_CLIENT_KEY: string
+  TOSS_SECRET_KEY: string
 }
 
 const app = new Hono<{ Bindings: Bindings }>()
@@ -372,6 +374,120 @@ app.patch('/api/orders/:orderId/status', async (c) => {
   } catch (error) {
     console.error('Failed to update order:', error)
     return c.json({ error: 'Failed to update order' }, 500)
+  }
+})
+
+// Payment APIs - Toss Payments Integration
+// API: Request payment
+app.post('/api/payment/request', async (c) => {
+  try {
+    const { orderId, amount, orderName } = await c.req.json()
+    const user = await getUser(c)
+    
+    if (!user) {
+      return c.json({ error: 'Authentication required' }, 401)
+    }
+    
+    // Return client key and payment info
+    return c.json({
+      clientKey: c.env.TOSS_CLIENT_KEY,
+      amount,
+      orderId,
+      orderName,
+      customerName: user.user_metadata?.name || user.email,
+      customerEmail: user.email
+    })
+  } catch (error: any) {
+    console.error('Payment request failed:', error)
+    return c.json({ error: 'Payment request failed' }, 500)
+  }
+})
+
+// API: Confirm payment
+app.post('/api/payment/confirm', async (c) => {
+  try {
+    const { paymentKey, orderId, amount } = await c.req.json()
+    const user = await getUser(c)
+    
+    if (!user) {
+      return c.json({ error: 'Authentication required' }, 401)
+    }
+    
+    // Call Toss Payments API to confirm payment
+    const response = await fetch('https://api.tosspayments.com/v1/payments/confirm', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Basic ' + btoa(c.env.TOSS_SECRET_KEY + ':'),
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        paymentKey,
+        orderId,
+        amount
+      })
+    })
+    
+    const paymentData = await response.json()
+    
+    if (!response.ok) {
+      throw new Error(paymentData.message || 'Payment confirmation failed')
+    }
+    
+    // Update order status to paid
+    const supabase = createSupabaseClient(c.env)
+    await supabase
+      .from('orders')
+      .update({ 
+        status: 'crafting',
+        payment_status: 'paid',
+        payment_key: paymentKey
+      })
+      .eq('order_number', orderId)
+    
+    return c.json({ 
+      success: true,
+      payment: paymentData
+    })
+  } catch (error: any) {
+    console.error('Payment confirmation failed:', error)
+    return c.json({ error: error.message || 'Payment confirmation failed' }, 500)
+  }
+})
+
+// API: Cancel payment
+app.post('/api/payment/cancel', async (c) => {
+  try {
+    const { paymentKey, cancelReason } = await c.req.json()
+    const user = await getUser(c)
+    
+    if (!user) {
+      return c.json({ error: 'Authentication required' }, 401)
+    }
+    
+    const response = await fetch(`https://api.tosspayments.com/v1/payments/${paymentKey}/cancel`, {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Basic ' + btoa(c.env.TOSS_SECRET_KEY + ':'),
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        cancelReason
+      })
+    })
+    
+    const cancelData = await response.json()
+    
+    if (!response.ok) {
+      throw new Error(cancelData.message || 'Payment cancellation failed')
+    }
+    
+    return c.json({ 
+      success: true,
+      cancellation: cancelData
+    })
+  } catch (error: any) {
+    console.error('Payment cancellation failed:', error)
+    return c.json({ error: error.message || 'Payment cancellation failed' }, 500)
   }
 })
 
@@ -1454,6 +1570,154 @@ app.get('/my-rhythm', (c) => {
         </div>
         
         <script src="/static/my-rhythm.js"></script>
+    </body>
+    </html>
+  `)
+})
+
+// Payment Page
+app.get('/payment', (c) => {
+  return c.html(`
+    <!DOCTYPE html>
+    <html lang="ko">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Urban Fresh - Payment</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <script src="https://js.tosspayments.com/v1/payment-widget"></script>
+        <style>
+            body {
+                font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+                background: #1A1A1B;
+                color: #F9FAFB;
+            }
+        </style>
+    </head>
+    <body class="min-h-screen flex items-center justify-center p-6">
+        <div class="text-center">
+            <div class="animate-spin w-12 h-12 border-4 border-gray-800 border-t-[#00FF85] rounded-full mx-auto mb-4"></div>
+            <p class="text-gray-400">결제를 준비하고 있습니다...</p>
+        </div>
+        <script src="/static/payment.js"></script>
+    </body>
+    </html>
+  `)
+})
+
+// Payment Success Page
+app.get('/payment-success', (c) => {
+  return c.html(`
+    <!DOCTYPE html>
+    <html lang="ko">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Urban Fresh - Payment Success</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <style>
+            body {
+                font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+                background: #1A1A1B;
+                color: #F9FAFB;
+            }
+        </style>
+    </head>
+    <body class="min-h-screen flex items-center justify-center p-6">
+        <div class="max-w-md w-full text-center">
+            <div class="mb-8">
+                <div class="w-20 h-20 bg-[#00FF85] rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-10 h-10 text-[#1A1A1B]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+                    </svg>
+                </div>
+                <h1 class="text-3xl font-black mb-2">결제 완료!</h1>
+                <p class="text-gray-400">주문이 성공적으로 완료되었습니다</p>
+            </div>
+            <div id="loadingMessage" class="text-gray-500 mb-4">결제를 확인하고 있습니다...</div>
+        </div>
+        <script>
+            async function confirmPayment() {
+                const params = new URLSearchParams(window.location.search);
+                const paymentKey = params.get('paymentKey');
+                const orderId = params.get('orderId');
+                const amount = params.get('amount');
+                
+                const session = JSON.parse(localStorage.getItem('urban_fresh_session') || 'null');
+                
+                try {
+                    const response = await fetch('/api/payment/confirm', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': 'Bearer ' + session.access_token
+                        },
+                        body: JSON.stringify({ paymentKey, orderId, amount })
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        localStorage.setItem('currentOrderId', orderId);
+                        setTimeout(() => {
+                            window.location.href = '/order-success';
+                        }, 2000);
+                    } else {
+                        throw new Error(data.error);
+                    }
+                } catch (error) {
+                    document.getElementById('loadingMessage').textContent = '결제 확인 중 오류가 발생했습니다: ' + error.message;
+                }
+            }
+            
+            confirmPayment();
+        </script>
+    </body>
+    </html>
+  `)
+})
+
+// Payment Fail Page
+app.get('/payment-fail', (c) => {
+  return c.html(`
+    <!DOCTYPE html>
+    <html lang="ko">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Urban Fresh - Payment Failed</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <style>
+            body {
+                font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+                background: #1A1A1B;
+                color: #F9FAFB;
+            }
+        </style>
+    </head>
+    <body class="min-h-screen flex items-center justify-center p-6">
+        <div class="max-w-md w-full text-center">
+            <div class="mb-8">
+                <div class="w-20 h-20 bg-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </div>
+                <h1 class="text-3xl font-black mb-2">결제 실패</h1>
+                <p class="text-gray-400" id="errorMessage">결제가 취소되었거나 오류가 발생했습니다</p>
+            </div>
+            <button onclick="window.location.href='/dashboard'" 
+                    class="w-full py-4 bg-[#00FF85] text-[#1A1A1B] rounded-full font-black text-lg">
+                다시 주문하기
+            </button>
+        </div>
+        <script>
+            const params = new URLSearchParams(window.location.search);
+            const message = params.get('message');
+            if (message) {
+                document.getElementById('errorMessage').textContent = decodeURIComponent(message);
+            }
+        </script>
     </body>
     </html>
   `)
