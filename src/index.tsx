@@ -330,7 +330,10 @@ app.get('/api/orders/:orderId', async (c) => {
       pickupCode: order.pickup_code,
       qrCode: order.qr_code,
       createdAt: order.created_at,
-      pickupLocation: order.pickup_location
+      pickupLocation: order.pickup_location,
+      // Include related data
+      spot: order.spots,
+      collection: order.collections
     }
     
     return c.json({ order: transformedOrder })

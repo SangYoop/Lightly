@@ -2,23 +2,11 @@
     'use strict';
     
     const orderId = localStorage.getItem('currentOrderId');
-    const confirmedCollectionId = localStorage.getItem('confirmedCollection');
-    
-    const collectionNames = {
-        'sharp': '01. Sharp',
-        'vital': '02. Vital',
-        'calm': '03. Calm'
-    };
-    
-    const collectionNumbers = {
-        'sharp': '01',
-        'vital': '02',
-        'calm': '03'
-    };
     
     let currentStatus = 'crafting';
     let pollInterval;
     let spotData = null;
+    let orderData = null;
     
     // DOM Elements
     const menuName = document.getElementById('menuName');
@@ -48,55 +36,80 @@
     
     // Initialize
     async function init() {
-        // Load spot data first
-        await loadSpotData();
+        console.log('🚀 Order Success Page Initialized');
+        console.log('Order ID:', orderId);
         
-        // Set order meta info with fallback
-        let collectionId = confirmedCollectionId || 'sharp'; // Default to Sharp for testing
-        
-        if (collectionId) {
-            menuName.textContent = collectionNames[collectionId] || '--';
+        // Load order data first to get collection info
+        if (orderId) {
+            await loadOrderData();
         }
         
-        if (spotData) {
-            spotName.textContent = spotData.name;
-            pickupTimeEl.textContent = spotData.pickupTime + ' AM';
+        // Set order meta info
+        if (orderData) {
+            // Set menu name from collection data
+            if (orderData.collection) {
+                const collectionName = orderData.collection.title || orderData.collection.name;
+                const collectionNumber = orderData.collection.theme_no || '';
+                menuName.textContent = collectionNumber ? `${collectionNumber}. ${collectionName}` : collectionName;
+                console.log('✓ Menu name set:', menuName.textContent);
+            }
+            
+            // Set spot name
+            if (orderData.spot) {
+                spotName.textContent = orderData.spot.name;
+                console.log('✓ Spot name set:', spotName.textContent);
+            }
+            
+            // Set pickup time (11:30 AM default)
+            pickupTimeEl.textContent = '11:30:00 AM';
+            console.log('✓ Pickup time set');
+            
+            // Set pickup info if available
+            if (orderData.pickupCode) {
+                pickupCode.textContent = orderData.pickupCode;
+            }
+            if (orderData.qrCode) {
+                qrCodeDisplay.textContent = 'QR: ' + orderData.qrCode;
+            }
+            if (orderData.pickupLocation) {
+                pickupLocation.textContent = orderData.pickupLocation;
+            }
+            
+            // Set initial status
+            if (orderData.status) {
+                updateStatus(orderData.status);
+            }
+        } else {
+            console.warn('⚠️ No order data found');
         }
         
-        // Pickup details modal setup (must be after spotData is loaded)
+        // Pickup details modal setup
         setupPickupDetailsModal();
         
-        // Start polling for status updates (simulate real-time)
+        // Start polling for status updates
         if (orderId) {
             startPolling();
         }
         
         // Admin controls
         setupAdminControls();
-        
-        // Initial status update
-        updateStatus('crafting');
     }
     
-    // Load spot data
-    async function loadSpotData() {
-        let selectedSpotId = localStorage.getItem('selectedSpot');
-        
-        if (!selectedSpotId) {
-            selectedSpotId = 'dreamplus-gangnam';
-        }
-        
+    // Load order data from API
+    async function loadOrderData() {
         try {
-            const response = await fetch('/api/spots');
+            console.log('📦 Loading order data...');
+            const response = await fetch('/api/orders/' + orderId);
             const data = await response.json();
             
-            if (data.spots) {
-                spotData = data.spots.find(function(s) {
-                    return s.id === selectedSpotId;
-                });
+            if (data.order) {
+                orderData = data.order;
+                console.log('✓ Order data loaded:', orderData);
+            } else {
+                console.error('❌ No order in response:', data);
             }
         } catch (error) {
-            console.error('Failed to load spot data:', error);
+            console.error('❌ Failed to load order data:', error);
         }
     }
     
@@ -195,7 +208,7 @@
         }
         
         showPickupDetailsBtn.addEventListener('click', function() {
-            if (!spotData || !spotData.pickupDetails) {
+            if (!orderData || !orderData.spot || !orderData.spot.pickupDetails) {
                 alert('픽업 위치 정보를 불러올 수 없습니다.');
                 return;
             }
@@ -206,10 +219,10 @@
             const modalGuide = document.getElementById('modalPickupGuide');
             const modalSpotName = document.getElementById('modalSpotName');
             
-            if (modalSpotName) modalSpotName.textContent = spotData.name;
-            if (modalImage) modalImage.src = spotData.pickupDetails.image;
-            if (modalDescription) modalDescription.textContent = spotData.pickupDetails.description;
-            if (modalGuide) modalGuide.textContent = spotData.pickupDetails.guide;
+            if (modalSpotName) modalSpotName.textContent = orderData.spot.name;
+            if (modalImage) modalImage.src = orderData.spot.pickupDetails.image;
+            if (modalDescription) modalDescription.textContent = orderData.spot.pickupDetails.description;
+            if (modalGuide) modalGuide.textContent = orderData.spot.pickupDetails.guide;
             
             // Show modal
             pickupModal.classList.add('open');
