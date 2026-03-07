@@ -1966,24 +1966,69 @@ app.get('/login', (c) => {
                     console.log('Signup response:', data);
                     
                     if (data.session) {
-                        // Save session
+                        // Save session and auto-login
                         localStorage.setItem('urban_fresh_session', JSON.stringify(data.session));
                         
-                        // Redirect
-                        const redirectTo = localStorage.getItem('redirect_after_login') || '/';
-                        localStorage.removeItem('redirect_after_login');
-                        window.location.href = redirectTo;
-                    } else if (data.user && !data.session) {
-                        // Email confirmation required
-                        errorEl.textContent = '회원가입 완료! 이메일을 확인해주세요. (개발 환경에서는 자동 로그인됩니다)';
+                        // Show success message
+                        errorEl.textContent = '회원가입 완료! 로그인되었습니다.';
                         errorEl.classList.remove('hidden');
                         errorEl.classList.remove('text-red-400');
                         errorEl.classList.add('text-[#00FF85]');
                         
-                        // For development: redirect to login after 2 seconds
+                        // Redirect after short delay
                         setTimeout(() => {
-                            loginTab.click();
-                        }, 2000);
+                            const redirectTo = localStorage.getItem('redirect_after_login') || '/';
+                            localStorage.removeItem('redirect_after_login');
+                            window.location.href = redirectTo;
+                        }, 1000);
+                    } else if (data.user && !data.session) {
+                        // Email confirmation required, but try to login anyway
+                        errorEl.textContent = '회원가입 완료! 로그인을 시도합니다...';
+                        errorEl.classList.remove('hidden');
+                        errorEl.classList.remove('text-red-400');
+                        errorEl.classList.add('text-[#00FF85]');
+                        
+                        // Try to login immediately with the same credentials
+                        setTimeout(async () => {
+                            try {
+                                const loginResponse = await fetch('/api/auth/login', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ email, password })
+                                });
+                                
+                                const loginData = await loginResponse.json();
+                                
+                                if (loginData.session) {
+                                    // Login successful
+                                    localStorage.setItem('urban_fresh_session', JSON.stringify(loginData.session));
+                                    errorEl.textContent = '✓ 로그인 성공!';
+                                    
+                                    setTimeout(() => {
+                                        const redirectTo = localStorage.getItem('redirect_after_login') || '/';
+                                        localStorage.removeItem('redirect_after_login');
+                                        window.location.href = redirectTo;
+                                    }, 1000);
+                                } else {
+                                    // Login failed, show instructions
+                                    errorEl.textContent = '⚠️ 회원가입은 완료되었으나 이메일 확인이 필요합니다.\\n\\nSupabase 대시보드 → Authentication → Settings에서\\n"Confirm email"을 비활성화한 후 로그인해주세요.';
+                                    errorEl.classList.remove('text-[#00FF85]');
+                                    errorEl.classList.add('text-yellow-400');
+                                    errorEl.style.whiteSpace = 'pre-line';
+                                    
+                                    // Switch to login tab
+                                    setTimeout(() => {
+                                        loginTab.click();
+                                    }, 5000);
+                                }
+                            } catch (err) {
+                                console.error('Auto-login failed:', err);
+                                errorEl.textContent = '회원가입은 완료되었습니다. 로그인 탭에서 로그인해주세요.';
+                                setTimeout(() => {
+                                    loginTab.click();
+                                }, 2000);
+                            }
+                        }, 1000);
                     } else {
                         // Show detailed error message
                         let errorMessage = data.error || '회원가입에 실패했습니다.';
