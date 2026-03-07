@@ -606,7 +606,18 @@ app.get('/', (c) => {
         <div class="min-h-screen flex flex-col safe-top safe-bottom">
             
             <!-- Header - Bold & Impactful -->
-            <header class="px-6 pt-12 pb-8">
+            <header class="px-6 pt-12 pb-8 relative">
+                <!-- User Icon - Top Right -->
+                <div class="absolute top-8 right-6 z-50">
+                    <a href="/my-rhythm">
+                        <div class="w-10 h-10 rounded-full border-2 border-gray-700 flex items-center justify-center hover:border-[#00FF85] transition-colors active:scale-95">
+                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                            </svg>
+                        </div>
+                    </a>
+                </div>
+                
                 <div class="flex items-center justify-between mb-8">
                     <div class="text-xs text-gray-500 tracking-widest uppercase font-semibold">Step 1 of 3</div>
                     <div class="text-xs text-gray-500 font-medium">Urban Fresh</div>
@@ -1048,6 +1059,17 @@ app.get('/order-success', (c) => {
         </style>
     </head>
     <body>
+        <!-- User Icon - Top Right -->
+        <div class="fixed top-8 right-6 z-50">
+            <a href="/my-rhythm">
+                <div class="w-10 h-10 rounded-full border-2 border-gray-700 flex items-center justify-center hover:border-[#00FF85] transition-colors active:scale-95">
+                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                    </svg>
+                </div>
+            </a>
+        </div>
+        
         <div class="min-h-screen flex flex-col items-center justify-center px-6 py-12">
             
             <!-- Main Content - Magazine Layout -->
