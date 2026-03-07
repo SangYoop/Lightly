@@ -89,14 +89,13 @@
                 'role="button" tabindex="0">' +
                 
                 '<!-- Image Area -->' +
-                '<div class="image-placeholder aspect-[4/3] flex items-center justify-center p-8">' +
-                    '<div class="text-center max-w-sm">' +
-                        '<div class="text-6xl font-black text-white/10 mb-4">' + collection.number + '</div>' +
-                        '<div class="text-xs text-gray-600 leading-relaxed font-light">' +
-                            'Deep Slate 배경에 대비되는<br>' +
-                            '아주 신선한 유기농 채소 이미지<br>' +
-                            '<span class="neo-mint">Digital-Organic</span> Concept' +
-                        '</div>' +
+                '<div class="relative aspect-[4/3] overflow-hidden bg-gray-900">' +
+                    '<img src="' + collection.image + '" ' +
+                         'alt="' + collection.name + ' - ' + collection.tagline + '" ' +
+                         'class="w-full h-full object-cover" ' +
+                         'loading="lazy">' +
+                    '<div class="absolute top-4 right-4">' +
+                        '<div class="text-4xl font-black text-white/90 drop-shadow-lg">' + collection.number + '</div>' +
                     '</div>' +
                 '</div>' +
                 
@@ -167,6 +166,13 @@
         }).join('');
         
         drawerContent.innerHTML = 
+            '<!-- Collection Image -->' +
+            '<div class="relative aspect-[4/3] rounded-2xl overflow-hidden mb-6">' +
+                '<img src="' + collection.image + '" ' +
+                     'alt="' + collection.name + '" ' +
+                     'class="w-full h-full object-cover">' +
+            '</div>' +
+            
             '<!-- Collection Header -->' +
             '<div class="mb-6">' +
                 '<div class="text-xs text-gray-500 uppercase tracking-wider font-semibold mb-2">' +
