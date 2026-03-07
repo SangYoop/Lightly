@@ -791,21 +791,23 @@ app.get('/dashboard', (c) => {
         <!-- Header with Spot & Timer -->
         <header class="sticky top-0 z-40 bg-gradient-to-b from-[#1A1A1B] to-transparent backdrop-blur-sm">
             <div class="px-6 pt-8 pb-4">
-                <div class="flex items-start justify-between">
-                    <!-- Selected Spot -->
-                    <div class="flex-1">
-                        <div class="text-xs text-gray-500 mb-1 font-medium uppercase tracking-wider">Pickup at</div>
-                        <h2 id="spotName" class="text-lg font-black">로딩 중...</h2>
-                    </div>
-                    
-                    <!-- User Icon -->
-                    <a href="/my-rhythm" class="mr-3 mt-1">
-                        <div class="w-10 h-10 rounded-full border-2 border-gray-700 flex items-center justify-center hover:border-[#00FF85] transition-colors">
+                <!-- User Icon - Top Right -->
+                <div class="absolute top-6 right-6 z-50">
+                    <a href="/my-rhythm">
+                        <div class="w-10 h-10 rounded-full border-2 border-gray-700 flex items-center justify-center hover:border-[#00FF85] transition-colors active:scale-95">
                             <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                             </svg>
                         </div>
                     </a>
+                </div>
+                
+                <div class="flex items-start justify-between pr-14">
+                    <!-- Selected Spot -->
+                    <div class="flex-1">
+                        <div class="text-xs text-gray-500 mb-1 font-medium uppercase tracking-wider">Pickup at</div>
+                        <h2 id="spotName" class="text-lg font-black">로딩 중...</h2>
+                    </div>
                     
                     <!-- Real-time Timer -->
                     <div class="text-right timer-pulse border-2 border-[#00FF85]/30 rounded-xl px-3 py-2">

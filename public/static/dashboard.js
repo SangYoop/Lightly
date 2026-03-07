@@ -257,9 +257,23 @@
         
         // Create order via API
         try {
+            // Get auth token
+            const session = JSON.parse(localStorage.getItem('urban_fresh_session') || 'null');
+            
+            if (!session || !session.access_token) {
+                // Not authenticated, redirect to login
+                alert('로그인이 필요합니다.');
+                localStorage.setItem('redirect_after_login', '/dashboard');
+                window.location.href = '/login';
+                return;
+            }
+            
             const response = await fetch('/api/orders', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + session.access_token
+                },
                 body: JSON.stringify({
                     spotId: selectedSpotId,
                     collectionId: collectionId
@@ -268,12 +282,21 @@
             
             const data = await response.json();
             
+            if (response.status === 401) {
+                // Auth failed, redirect to login
+                alert('로그인이 필요합니다.');
+                localStorage.setItem('redirect_after_login', '/dashboard');
+                window.location.href = '/login';
+                return;
+            }
+            
             if (data.order) {
                 // Save order ID for status tracking
                 localStorage.setItem('currentOrderId', data.order.id);
             }
         } catch (error) {
-            console.error('Failed to create order:', error);
+            alert('주문 생성 중 오류가 발생했습니다.');
+            return;
         }
         
         // Redirect to success page
