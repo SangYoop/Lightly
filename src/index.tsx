@@ -2041,7 +2041,8 @@ app.get('/login', (c) => {
                         } else if (errorMessage.includes('Password')) {
                             errorMessage = '비밀번호 형식이 올바르지 않습니다.';
                         } else if (errorMessage.includes('Email rate limit')) {
-                            errorMessage = '너무 많은 요청이 발생했습니다. 잠시 후 다시 시도해주세요.';
+                            errorMessage = '⏱️ Rate Limit 초과\\n\\n같은 이메일로 너무 많은 회원가입 시도가 있었습니다.\\n\\n해결 방법:\\n1. 다른 이메일 주소로 회원가입\\n2. 1시간 후 다시 시도\\n3. 이미 계정이 있다면 로그인 탭에서 로그인';
+                            errorEl.style.whiteSpace = 'pre-line';
                         }
                         
                         errorEl.textContent = errorMessage;
