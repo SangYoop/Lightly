@@ -619,8 +619,8 @@ app.get('/', (c) => {
             
             body {
                 font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-                background: #FFFFFF;
-                color: #001F3F;
+                background: #F8FAFC;
+                color: #0B1222;
                 -webkit-font-smoothing: antialiased;
                 -moz-osx-font-smoothing: grayscale;
             }
@@ -926,7 +926,7 @@ app.get('/dashboard', (c) => {
                 bottom: 0;
                 left: 0;
                 right: 0;
-                background: #FFFFFF;
+                background: #F8FAFC;
                 border-top-left-radius: 24px;
                 border-top-right-radius: 24px;
                 transform: translateY(100%);
@@ -963,38 +963,38 @@ app.get('/dashboard', (c) => {
     </head>
     <body>
         <!-- Header with Spot & Timer -->
-        <header class="sticky top-0 z-40 bg-gradient-to-b from-[#FFFFFF] to-transparent backdrop-blur-sm">
-            <div class="px-6 pt-8 pb-4">
-                <!-- Lightly Logo - Top Left -->
-                <div class="absolute top-6 left-6 z-50">
-                    <div class="flex flex-col">
-                        <span class="text-sm font-bold text-[#001F3F]">Lightly</span>
-                        <span class="text-[9px] text-gray-400">Health is not expensive</span>
+        <header class="sticky top-0 z-40 bg-[#0B1222] shadow-lg">
+            <div class="px-6 pt-6 pb-5">
+                <!-- Lightly Logo - Center -->
+                <div class="flex justify-center mb-5">
+                    <div class="flex flex-col items-center">
+                        <span class="text-base font-extrabold text-white tracking-tight">Lightly</span>
+                        <span class="text-[8px] text-gray-400 tracking-[0.15em] uppercase">Health is not expensive</span>
                     </div>
                 </div>
                 
                 <!-- User Icon - Top Right -->
                 <div class="absolute top-6 right-6 z-50">
                     <a href="/my-rhythm">
-                        <div class="w-10 h-10 rounded-full border border-gray-300 flex items-center justify-center hover:border-[#001F3F] transition-colors active:scale-95">
-                            <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div class="w-10 h-10 rounded-full border border-gray-600 flex items-center justify-center hover:border-[#00F5A0] transition-colors active:scale-95">
+                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                             </svg>
                         </div>
                     </a>
                 </div>
                 
-                <div class="flex items-start justify-between pr-14 mt-16">
+                <div class="flex items-start justify-between gap-4">
                     <!-- Selected Spot -->
                     <div class="flex-1">
                         <div class="text-xs text-gray-500 mb-1 font-medium uppercase tracking-wider">수령 스팟</div>
-                        <h2 id="spotName" class="text-lg font-bold text-[#001F3F]">로딩 중...</h2>
+                        <h2 id="spotName" class="text-base font-extrabold text-white">로딩 중...</h2>
                     </div>
                     
                     <!-- Real-time Timer -->
-                    <div class="text-right timer-pulse border border-[#98FFD8] rounded-xl px-3 py-2">
-                        <div class="text-xs text-gray-500 mb-0.5 font-medium">마감까지</div>
-                        <div id="countdown" class="text-sm font-bold text-[#98FFD8]">--:--:--</div>
+                    <div class="text-right border border-[#00F5A0] rounded-xl px-3 py-2 bg-[#00F5A0]/10">
+                        <div class="text-xs text-gray-400 mb-0.5 font-medium">마감까지</div>
+                        <div id="countdown" class="text-sm font-bold text-[#00F5A0]">--:--:--</div>
                     </div>
                 </div>
             </div>
@@ -1027,12 +1027,12 @@ app.get('/dashboard', (c) => {
         <!-- Drawer (Slide-up Detail View) -->
         <div class="drawer-backdrop" id="drawerBackdrop"></div>
         <div class="drawer safe-bottom" id="drawer">
-            <div class="sticky top-0 bg-[#FAFAFA] z-10 px-6 pt-6 pb-4">
-                <div class="w-12 h-1 bg-gray-700 rounded-full mx-auto mb-6"></div>
-                <button id="closeDrawer" class="text-gray-400 text-sm font-medium">← 닫기</button>
+            <div class="sticky top-0 bg-[#F8FAFC] z-10 px-6 pt-6 pb-4">
+                <div class="w-12 h-1 bg-gray-300 rounded-full mx-auto mb-6"></div>
+                <button id="closeDrawer" class="text-gray-600 text-sm font-semibold">← 닫기</button>
             </div>
-            <div id="drawerContent" class="px-6 pb-8">
-                <!-- Dynamic content -->
+            <div id="drawerContent" class="px-6 pb-32">
+                <!-- Bento Grid Dynamic Content -->
             </div>
         </div>
         

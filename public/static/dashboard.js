@@ -167,74 +167,86 @@
     // Open drawer with collection details
     function openDrawer(collection) {
         const ingredientsHtml = collection.ingredients.map(function(ingredient) {
-            return '<span class="px-4 py-2 bg-gray-900 rounded-full text-sm">' + ingredient + '</span>';
+            return '<span class="px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-xs text-gray-700">' + ingredient + '</span>';
         }).join('');
         
         drawerContent.innerHTML = 
-            '<!-- Collection Image -->' +
-            '<div class="relative aspect-[4/3] rounded-2xl overflow-hidden mb-6">' +
-                '<img src="' + collection.image + '" ' +
-                     'alt="' + collection.name + '" ' +
-                     'class="w-full h-full object-cover">' +
-            '</div>' +
+            '<!-- Bento Grid Layout -->' +
+            '<div class="space-y-4">' +
             
-            '<!-- Collection Header -->' +
-            '<div class="mb-6">' +
-                '<div class="text-xs text-gray-500 uppercase tracking-wider font-semibold mb-2">' +
-                    collection.number + ' · ' + collection.price.toLocaleString() + '원' +
-                '</div>' +
-                '<h2 class="text-4xl font-black mb-2">' + collection.name + '</h2>' +
-                '<p class="text-lg text-gray-400 mb-4">' + collection.tagline + '</p>' +
-                '<p class="text-sm text-gray-500">' + collection.description + '</p>' +
-            '</div>' +
-            
-            '<!-- Nutrition Info -->' +
-            '<div class="bg-gray-900/50 rounded-2xl p-5 mb-6">' +
-                '<div class="text-sm font-bold mb-4">영양 정보</div>' +
-                '<div class="grid grid-cols-4 gap-4 text-center">' +
-                    '<div>' +
-                        '<div class="text-xs text-gray-500 mb-1">칼로리</div>' +
-                        '<div class="text-lg font-black neo-mint">' + collection.nutrition.calories + '</div>' +
-                        '<div class="text-xs text-gray-600">kcal</div>' +
-                    '</div>' +
-                    '<div>' +
-                        '<div class="text-xs text-gray-500 mb-1">단백질</div>' +
-                        '<div class="text-lg font-black">' + collection.nutrition.protein + 'g</div>' +
-                    '</div>' +
-                    '<div>' +
-                        '<div class="text-xs text-gray-500 mb-1">탄수화물</div>' +
-                        '<div class="text-lg font-black">' + collection.nutrition.carbs + 'g</div>' +
-                    '</div>' +
-                    '<div>' +
-                        '<div class="text-xs text-gray-500 mb-1">지방</div>' +
-                        '<div class="text-lg font-black">' + collection.nutrition.fat + 'g</div>' +
+                '<!-- Image Card (Full Width) -->' +
+                '<div class="bg-white border border-gray-200 rounded-2xl overflow-hidden">' +
+                    '<div class="relative aspect-[4/3]">' +
+                        '<img src="' + collection.image + '" ' +
+                             'alt="' + collection.name + '" ' +
+                             'class="w-full h-full object-cover">' +
                     '</div>' +
                 '</div>' +
-            '</div>' +
-            
-            '<!-- Ingredients -->' +
-            '<div class="mb-6">' +
-                '<div class="text-sm font-bold mb-3">구성 재료</div>' +
-                '<div class="flex flex-wrap gap-2">' +
-                    ingredientsHtml +
+                
+                '<!-- Title Card (Full Width) -->' +
+                '<div class="bg-white border border-gray-200 rounded-2xl p-6">' +
+                    '<div class="text-xs text-gray-500 uppercase tracking-[0.1em] font-semibold mb-2">' +
+                        collection.number +
+                    '</div>' +
+                    '<h2 class="text-3xl font-extrabold mb-2 text-[#0B1222]">' + collection.name + '</h2>' +
+                    '<p class="text-base text-gray-600 mb-3" style="letter-spacing: 0.01em;">' + collection.tagline + '</p>' +
+                    '<p class="text-sm text-gray-500 leading-relaxed">' + collection.description + '</p>' +
                 '</div>' +
-            '</div>' +
-            
-            '<!-- Weekly Wellness (건기식) -->' +
-            '<div class="mb-6 bg-gradient-to-r from-green-900/20 to-emerald-900/10 border border-[#98FFD8]/20 rounded-2xl p-5">' +
-                '<div class="flex items-center gap-2 mb-3">' +
-                    '<span class="text-2xl">💊</span>' +
-                    '<div class="text-sm font-bold neo-mint">Weekly Wellness</div>' +
+                
+                '<!-- Nutrition Bento Grid (2x2) -->' +
+                '<div class="grid grid-cols-2 gap-3">' +
+                    '<div class="bg-white border border-gray-200 rounded-2xl p-5 text-center">' +
+                        '<div class="text-xs text-gray-500 mb-2 uppercase tracking-wider">칼로리</div>' +
+                        '<div class="text-2xl font-extrabold text-[#0B1222]">' + collection.nutrition.calories + '</div>' +
+                        '<div class="text-xs text-gray-400 mt-1">kcal</div>' +
+                    '</div>' +
+                    '<div class="bg-white border border-gray-200 rounded-2xl p-5 text-center">' +
+                        '<div class="text-xs text-gray-500 mb-2 uppercase tracking-wider">단백질</div>' +
+                        '<div class="text-2xl font-extrabold text-[#0B1222]">' + collection.nutrition.protein + '</div>' +
+                        '<div class="text-xs text-gray-400 mt-1">g</div>' +
+                    '</div>' +
+                    '<div class="bg-white border border-gray-200 rounded-2xl p-5 text-center">' +
+                        '<div class="text-xs text-gray-500 mb-2 uppercase tracking-wider">탄수화물</div>' +
+                        '<div class="text-2xl font-extrabold text-[#0B1222]">' + collection.nutrition.carbs + '</div>' +
+                        '<div class="text-xs text-gray-400 mt-1">g</div>' +
+                    '</div>' +
+                    '<div class="bg-white border border-gray-200 rounded-2xl p-5 text-center">' +
+                        '<div class="text-xs text-gray-500 mb-2 uppercase tracking-wider">지방</div>' +
+                        '<div class="text-2xl font-extrabold text-[#0B1222]">' + collection.nutrition.fat + '</div>' +
+                        '<div class="text-xs text-gray-400 mt-1">g</div>' +
+                    '</div>' +
                 '</div>' +
-                '<p class="text-sm text-gray-300 leading-relaxed">' + collection.supplement + '</p>' +
-                '<div class="mt-3 text-xs text-gray-500">매주 바뀌는 프리미엄 건강기능식품 1회분 제공</div>' +
+                
+                '<!-- Ingredients Card -->' +
+                '<div class="bg-white border border-gray-200 rounded-2xl p-6">' +
+                    '<div class="text-sm font-bold mb-4 text-[#0B1222]">구성 재료</div>' +
+                    '<div class="flex flex-wrap gap-2">' +
+                        ingredientsHtml +
+                    '</div>' +
+                '</div>' +
+                
+                '<!-- Lightly Shot Card (물방울 아이콘) -->' +
+                '<div class="bg-white border border-[#00F5A0] rounded-2xl p-6">' +
+                    '<div class="flex items-center gap-3 mb-3">' +
+                        '<svg class="w-6 h-6 text-[#00F5A0]" fill="currentColor" viewBox="0 0 24 24">' +
+                            '<path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>' +
+                        '</svg>' +
+                        '<div class="text-base font-bold text-[#0B1222]">라이틀리 샷</div>' +
+                    '</div>' +
+                    '<p class="text-sm text-gray-600 leading-relaxed mb-3">' + collection.supplement + '</p>' +
+                    '<div class="text-xs text-gray-500">매주 바뀌는 프리미엄 액상 영양제 제공</div>' +
+                '</div>' +
+                
             '</div>' +
             
-            '<!-- Confirm & Reserve Button -->' +
-            '<button class="w-full py-5 bg-[#98FFD8] text-[#FAFAFA] rounded-full font-black text-lg tracking-tight" ' +
-                    'onclick="window.confirmAndReserve(\'' + collection.id + '\')">' +
-                'Confirm & Reserve · ₩9,900' +
-            '</button>';
+            '<!-- Bottom Fixed CTA (Midnight Navy with Mint Underline) -->' +
+            '<div class="fixed bottom-0 left-0 right-0 p-6 bg-[#F8FAFC] border-t border-gray-200 z-50">' +
+                '<button class="w-full py-5 bg-[#0B1222] text-white rounded-2xl font-bold text-lg tracking-tight relative overflow-hidden" ' +
+                        'onclick="window.confirmAndReserve(\'' + collection.id + '\')">' +
+                    '<span class="relative z-10">Confirm & Reserve · ₩' + collection.price.toLocaleString() + '</span>' +
+                    '<div class="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-20 h-1 bg-[#00F5A0]"></div>' +
+                '</button>' +
+            '</div>';
         
         // Show drawer
         drawer.classList.add('open');
