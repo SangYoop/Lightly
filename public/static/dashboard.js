@@ -107,12 +107,17 @@
                             '<div class="text-xs text-gray-500 uppercase tracking-wider font-semibold mb-1">' +
                                 collection.number +
                             '</div>' +
-                            '<h3 class="text-2xl font-black mb-1">' + collection.name + '</h3>' +
-                            '<p class="text-sm text-gray-400">' + collection.tagline + '</p>' +
+                            '<h3 class="text-2xl font-black mb-1 text-[#001F3F]">' + collection.name + '</h3>' +
+                            '<p class="text-sm text-gray-500">' + collection.tagline + '</p>' +
+                            '<!-- Lightly Chip Badge -->' +
+                            '<div class="flex items-center gap-1.5 mt-2">' +
+                                '<div class="w-4 h-2.5 rounded-full bg-[#98FFD8]"></div>' +
+                                '<span class="text-[10px] text-[#98FFD8] font-semibold">라이틀리 칩 (영양제 1알) 포함</span>' +
+                            '</div>' +
                         '</div>' +
                         '<div class="text-right">' +
                             '<div class="text-xs text-gray-500 mb-1">재고</div>' +
-                            '<div class="text-lg font-black neo-mint">' + collection.unitsLeft + '</div>' +
+                            '<div class="text-lg font-bold text-[#98FFD8]">' + collection.unitsLeft + '</div>' +
                             '<div class="text-xs text-gray-500">Units</div>' +
                         '</div>' +
                     '</div>' +
@@ -123,9 +128,9 @@
                     '</div>' +
                     
                     '<!-- Price & CTA -->' +
-                    '<div class="flex items-center justify-between pt-4 border-t border-gray-800">' +
-                        '<div class="text-xl font-black">' + collection.price.toLocaleString() + '원</div>' +
-                        '<div class="text-sm text-gray-500 flex items-center gap-1">' +
+                    '<div class="flex items-center justify-between pt-4 border-t border-gray-200">' +
+                        '<div class="text-xl font-bold text-[#001F3F]">' + collection.price.toLocaleString() + '원</div>' +
+                        '<div class="text-sm text-gray-500 flex items-center gap-1 font-medium">' +
                             '탭하여 상세보기' +
                             '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">' +
                                 '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/>' +

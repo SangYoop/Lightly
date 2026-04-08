@@ -619,12 +619,35 @@ app.get('/', (c) => {
             
             body {
                 font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-                background: #FAFAFA;
+                background: #FFFFFF;
                 color: #001F3F;
                 -webkit-font-smoothing: antialiased;
                 -moz-osx-font-smoothing: grayscale;
             }
             
+            /* ============================================
+               LIGHTLY COLOR SYSTEM (High-Contrast Minimal)
+               ============================================ */
+            
+            /* Primary Color: Deep Navy */
+            .primary-color {
+                color: #001F3F;
+            }
+            
+            .primary-bg {
+                background: #001F3F;
+            }
+            
+            /* Accent Color: Mint Green (used sparingly) */
+            .accent-color {
+                color: #98FFD8;
+            }
+            
+            .accent-bg {
+                background: #98FFD8;
+            }
+            
+            /* Legacy support */
             .neo-mint {
                 color: #98FFD8;
             }
@@ -645,14 +668,15 @@ app.get('/', (c) => {
                 font-size: clamp(0.875rem, 3.5vw, 1rem);
             }
             
-            /* Mobile-First Spot Card */
+            /* Mobile-First Spot Card (Minimal Style) */
             .spot-card {
-                background: rgba(249, 250, 251, 0.04);
-                border: 2px solid rgba(249, 250, 251, 0.1);
+                background: #FFFFFF;
+                border: 1px solid #E5E7EB;
                 transition: all 0.2s ease-out;
                 touch-action: manipulation;
                 position: relative;
                 overflow: hidden;
+                box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
             }
             
             .spot-card::before {
@@ -662,13 +686,13 @@ app.get('/', (c) => {
                 left: -100%;
                 width: 100%;
                 height: 100%;
-                background: linear-gradient(90deg, transparent, rgba(0, 255, 133, 0.1), transparent);
+                background: linear-gradient(90deg, transparent, rgba(152, 255, 216, 0.08), transparent);
                 transition: left 0.5s;
             }
             
             .spot-card:active {
                 transform: scale(0.98);
-                border-color: #98FFD8;
+                border-color: #001F3F;
             }
             
             .spot-card.selected::before {
@@ -739,25 +763,33 @@ app.get('/', (c) => {
             
             <!-- Header - Bold & Impactful -->
             <header class="px-6 pt-12 pb-8 relative">
+                <!-- Lightly Logo - Top Left -->
+                <div class="absolute top-8 left-6 z-50">
+                    <div class="flex flex-col">
+                        <span class="text-lg font-bold text-[#001F3F]">Lightly</span>
+                        <span class="text-[10px] text-gray-400">Health is not expensive</span>
+                    </div>
+                </div>
+                
                 <!-- User Icon - Top Right -->
                 <div class="absolute top-8 right-6 z-50">
                     <a href="/my-rhythm">
-                        <div class="w-10 h-10 rounded-full border-2 border-gray-700 flex items-center justify-center hover:border-[#98FFD8] transition-colors active:scale-95">
-                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div class="w-10 h-10 rounded-full border border-gray-300 flex items-center justify-center hover:border-[#001F3F] transition-colors active:scale-95">
+                            <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                             </svg>
                         </div>
                     </a>
                 </div>
                 
-                <div class="flex items-center justify-between mb-8">
+                <div class="flex items-center justify-between mb-8 mt-16">
                     <div class="text-xs text-gray-500 tracking-widest uppercase font-semibold">Step 1 of 3</div>
                 </div>
                 <h1 class="main-title mb-4">
-                    Pick<br>Your<br><span class="neo-mint">Spot</span>
+                    Pick<br>Your<br><span class="text-[#001F3F]">Spot</span>
                 </h1>
-                <p class="subtitle text-gray-400 font-medium">
-                    픽업할 오피스 거점을 선택하세요
+                <p class="subtitle text-gray-500 font-medium">
+                    수령 스팟을 선택하세요
                 </p>
             </header>
             
@@ -817,7 +849,7 @@ app.get('/dashboard', (c) => {
             
             body {
                 font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-                background: #FAFAFA;
+                background: #FFFFFF;
                 color: #001F3F;
                 -webkit-font-smoothing: antialiased;
                 padding-bottom: 100px; /* Space for floating button */
@@ -894,7 +926,7 @@ app.get('/dashboard', (c) => {
                 bottom: 0;
                 left: 0;
                 right: 0;
-                background: #FAFAFA;
+                background: #FFFFFF;
                 border-top-left-radius: 24px;
                 border-top-right-radius: 24px;
                 transform: translateY(100%);
@@ -931,30 +963,38 @@ app.get('/dashboard', (c) => {
     </head>
     <body>
         <!-- Header with Spot & Timer -->
-        <header class="sticky top-0 z-40 bg-gradient-to-b from-[#FAFAFA] to-transparent backdrop-blur-sm">
+        <header class="sticky top-0 z-40 bg-gradient-to-b from-[#FFFFFF] to-transparent backdrop-blur-sm">
             <div class="px-6 pt-8 pb-4">
+                <!-- Lightly Logo - Top Left -->
+                <div class="absolute top-6 left-6 z-50">
+                    <div class="flex flex-col">
+                        <span class="text-sm font-bold text-[#001F3F]">Lightly</span>
+                        <span class="text-[9px] text-gray-400">Health is not expensive</span>
+                    </div>
+                </div>
+                
                 <!-- User Icon - Top Right -->
                 <div class="absolute top-6 right-6 z-50">
                     <a href="/my-rhythm">
-                        <div class="w-10 h-10 rounded-full border-2 border-gray-700 flex items-center justify-center hover:border-[#98FFD8] transition-colors active:scale-95">
-                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div class="w-10 h-10 rounded-full border border-gray-300 flex items-center justify-center hover:border-[#001F3F] transition-colors active:scale-95">
+                            <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                             </svg>
                         </div>
                     </a>
                 </div>
                 
-                <div class="flex items-start justify-between pr-14">
+                <div class="flex items-start justify-between pr-14 mt-16">
                     <!-- Selected Spot -->
                     <div class="flex-1">
-                        <div class="text-xs text-gray-500 mb-1 font-medium uppercase tracking-wider">Pickup at</div>
-                        <h2 id="spotName" class="text-lg font-black">로딩 중...</h2>
+                        <div class="text-xs text-gray-500 mb-1 font-medium uppercase tracking-wider">수령 스팟</div>
+                        <h2 id="spotName" class="text-lg font-bold text-[#001F3F]">로딩 중...</h2>
                     </div>
                     
                     <!-- Real-time Timer -->
-                    <div class="text-right timer-pulse border-2 border-[#98FFD8]/30 rounded-xl px-3 py-2">
+                    <div class="text-right timer-pulse border border-[#98FFD8] rounded-xl px-3 py-2">
                         <div class="text-xs text-gray-500 mb-0.5 font-medium">마감까지</div>
-                        <div id="countdown" class="text-sm font-black neo-mint">--:--:--</div>
+                        <div id="countdown" class="text-sm font-bold text-[#98FFD8]">--:--:--</div>
                     </div>
                 </div>
             </div>
@@ -964,10 +1004,10 @@ app.get('/dashboard', (c) => {
         <main class="px-6 pt-4 pb-8">
             <div class="mb-6">
                 <div class="text-xs text-gray-500 tracking-widest uppercase font-semibold mb-3">Step 2 of 3</div>
-                <h1 class="text-4xl font-black mb-2 leading-tight">
-                    The<br><span class="neo-mint">Collection</span>
+                <h1 class="text-4xl font-black mb-2 leading-tight text-[#001F3F]">
+                    The<br>Collection
                 </h1>
-                <p class="text-sm text-gray-400">오늘의 신선한 메뉴를 선택하세요</p>
+                <p class="text-sm text-gray-500">오늘의 신선한 메뉴를 선택하세요</p>
             </div>
             
             <div class="space-y-5" id="collectionsContainer">
@@ -980,7 +1020,7 @@ app.get('/dashboard', (c) => {
         </main>
         
         <!-- Floating Button (Hidden initially) -->
-        <button id="reviewButton" class="floating-button bg-[#98FFD8] text-[#FAFAFA] py-4 rounded-full font-black text-base hidden">
+        <button id="reviewButton" class="floating-button bg-[#001F3F] text-white py-4 rounded-full font-bold text-base hidden">
             Review Your Collection
         </button>
         
@@ -1023,7 +1063,7 @@ app.get('/order-success', (c) => {
             
             body {
                 font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-                background: #FAFAFA;
+                background: #FFFFFF;
                 color: #001F3F;
                 min-height: 100vh;
                 overflow-x: hidden;
@@ -1099,7 +1139,7 @@ app.get('/order-success', (c) => {
                 width: 12px;
                 height: 12px;
                 border-radius: 50%;
-                background: #FAFAFA;
+                background: #FFFFFF;
                 border: 2px solid rgba(249, 250, 251, 0.2);
                 transition: all 0.3s;
             }
@@ -1138,7 +1178,7 @@ app.get('/order-success', (c) => {
                 bottom: 0;
                 left: 0;
                 right: 0;
-                background: #FAFAFA;
+                background: #FFFFFF;
                 border-top-left-radius: 32px;
                 border-top-right-radius: 32px;
                 transform: translateY(100%);
@@ -1426,7 +1466,7 @@ app.get('/my-rhythm', (c) => {
             
             body {
                 font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-                background: #FAFAFA;
+                background: #FFFFFF;
                 color: #001F3F;
                 min-height: 100vh;
                 overflow-x: hidden;
@@ -1603,7 +1643,7 @@ app.get('/payment', (c) => {
         <style>
             body {
                 font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-                background: #FAFAFA;
+                background: #FFFFFF;
                 color: #001F3F;
             }
         </style>
@@ -1635,7 +1675,7 @@ app.get('/payment-success', (c) => {
         <style>
             body {
                 font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-                background: #FAFAFA;
+                background: #FFFFFF;
                 color: #001F3F;
             }
         </style>
@@ -1707,7 +1747,7 @@ app.get('/payment-fail', (c) => {
         <style>
             body {
                 font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-                background: #FAFAFA;
+                background: #FFFFFF;
                 color: #001F3F;
             }
         </style>
@@ -1724,7 +1764,7 @@ app.get('/payment-fail', (c) => {
                 <p class="text-gray-400" id="errorMessage">결제가 취소되었거나 오류가 발생했습니다</p>
             </div>
             <button onclick="window.location.href='/dashboard'" 
-                    class="w-full py-4 bg-[#98FFD8] text-[#FAFAFA] rounded-full font-black text-lg">
+                    class="w-full py-4 bg-[#001F3F] text-white rounded-full font-bold text-lg">
                 다시 주문하기
             </button>
         </div>
@@ -1762,41 +1802,81 @@ app.get('/login', (c) => {
             
             body {
                 font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-                background: #FAFAFA;
+                background: #FFFFFF;
                 color: #001F3F;
                 -webkit-font-smoothing: antialiased;
             }
             
-            .neo-mint {
-                color: #98FFD8;
+            /* Lightly Logo with Capsule Dot */
+            .lightly-logo {
+                font-size: 3rem;
+                font-weight: 900;
+                color: #001F3F;
+                letter-spacing: -0.02em;
             }
             
-            .neo-mint-bg {
-                background: #98FFD8;
+            .lightly-logo-dot {
+                display: inline-block;
+                width: 8px;
+                height: 16px;
+                background: #001F3F;
+                border-radius: 8px;
+                margin: 0 2px;
+                position: relative;
+                top: -8px;
             }
             
+            .slogan {
+                font-size: 0.75rem;
+                color: #9CA3AF;
+                font-weight: 400;
+                letter-spacing: 0.02em;
+            }
+            
+            /* Minimal Input Fields */
             .input-field {
-                background: rgba(249, 250, 251, 0.04);
-                border: 2px solid rgba(249, 250, 251, 0.1);
+                background: #FFFFFF;
+                border: 1px solid #E5E7EB;
                 transition: all 0.2s;
+                color: #001F3F;
             }
             
             .input-field:focus {
-                background: rgba(249, 250, 251, 0.06);
-                border-color: #98FFD8;
+                background: #FFFFFF;
+                border-color: #001F3F;
                 outline: none;
+                box-shadow: 0 0 0 1px #001F3F;
             }
             
+            /* Tab Buttons (Minimal with Accent) */
             .tab-button {
                 padding: 12px 24px;
                 border-bottom: 2px solid transparent;
                 transition: all 0.2s;
-                color: #6B7280;
+                color: #9CA3AF;
+                font-weight: 500;
             }
             
             .tab-button.active {
-                color: #98FFD8;
+                color: #001F3F;
                 border-bottom-color: #98FFD8;
+                font-weight: 600;
+            }
+            
+            /* Primary Button (Deep Navy) */
+            .btn-primary {
+                background: #001F3F;
+                color: #FFFFFF;
+                font-weight: 700;
+                transition: all 0.2s;
+            }
+            
+            .btn-primary:hover {
+                background: #003366;
+            }
+            
+            .btn-primary:active {
+                transform: scale(0.98);
             }
         </style>
     </head>
@@ -1805,14 +1885,14 @@ app.get('/login', (c) => {
             <div class="max-w-md w-full">
                 <!-- Logo/Header -->
                 <div class="text-center mb-12">
-                    <h1 class="text-5xl font-black mb-3">
-                        Urban<br><span class="neo-mint">Fresh</span>
+                    <h1 class="lightly-logo mb-2">
+                        L<span class="lightly-logo-dot"></span>ghtly
                     </h1>
-                    <p class="text-sm text-gray-400">프리미엄 오피스 웰니스 딜리버리</p>
+                    <p class="slogan">Health is not expensive</p>
                 </div>
                 
                 <!-- Tabs -->
-                <div class="flex border-b border-gray-800 mb-8">
+                <div class="flex border-b border-gray-200 mb-8">
                     <button class="tab-button active flex-1" id="loginTab">로그인</button>
                     <button class="tab-button flex-1" id="signupTab">회원가입</button>
                 </div>
@@ -1820,20 +1900,20 @@ app.get('/login', (c) => {
                 <!-- Login Form -->
                 <form id="loginForm" class="space-y-4">
                     <div>
-                        <label class="block text-sm font-medium mb-2">이메일</label>
+                        <label class="block text-sm font-semibold mb-2 text-gray-700">이메일</label>
                         <input type="email" id="loginEmail" 
-                               class="input-field w-full px-4 py-3 rounded-xl text-white"
+                               class="input-field w-full px-4 py-3 rounded-lg"
                                placeholder="your@email.com" required>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium mb-2">비밀번호</label>
+                        <label class="block text-sm font-semibold mb-2 text-gray-700">비밀번호</label>
                         <input type="password" id="loginPassword" 
-                               class="input-field w-full px-4 py-3 rounded-xl text-white"
+                               class="input-field w-full px-4 py-3 rounded-lg"
                                placeholder="••••••••" required>
                     </div>
-                    <div id="loginError" class="text-red-400 text-sm hidden"></div>
+                    <div id="loginError" class="text-red-500 text-sm hidden"></div>
                     <button type="submit" 
-                            class="w-full py-4 bg-[#98FFD8] text-[#FAFAFA] rounded-full font-black text-lg">
+                            class="btn-primary w-full py-4 rounded-full text-lg mt-6">
                         로그인
                     </button>
                 </form>
@@ -1841,39 +1921,39 @@ app.get('/login', (c) => {
                 <!-- Signup Form (Hidden) -->
                 <form id="signupForm" class="space-y-4 hidden">
                     <div>
-                        <label class="block text-sm font-medium mb-2">이름</label>
+                        <label class="block text-sm font-semibold mb-2 text-gray-700">이름</label>
                         <input type="text" id="signupName" 
-                               class="input-field w-full px-4 py-3 rounded-xl text-white"
+                               class="input-field w-full px-4 py-3 rounded-lg"
                                placeholder="홍길동" required>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium mb-2">이메일</label>
+                        <label class="block text-sm font-semibold mb-2 text-gray-700">이메일</label>
                         <input type="email" id="signupEmail" 
-                               class="input-field w-full px-4 py-3 rounded-xl text-white"
+                               class="input-field w-full px-4 py-3 rounded-lg"
                                placeholder="your@email.com" required>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium mb-2">비밀번호 (최소 6자)</label>
+                        <label class="block text-sm font-semibold mb-2 text-gray-700">비밀번호 (최소 6자)</label>
                         <input type="password" id="signupPassword" 
-                               class="input-field w-full px-4 py-3 rounded-xl text-white"
+                               class="input-field w-full px-4 py-3 rounded-lg"
                                placeholder="••••••••" required minlength="6">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium mb-2">비밀번호 확인</label>
+                        <label class="block text-sm font-semibold mb-2 text-gray-700">비밀번호 확인</label>
                         <input type="password" id="signupPasswordConfirm" 
-                               class="input-field w-full px-4 py-3 rounded-xl text-white"
+                               class="input-field w-full px-4 py-3 rounded-lg"
                                placeholder="••••••••" required minlength="6">
                     </div>
-                    <div id="signupError" class="text-red-400 text-sm hidden"></div>
+                    <div id="signupError" class="text-red-500 text-sm hidden"></div>
                     <button type="submit" id="signupButton"
-                            class="w-full py-4 bg-[#98FFD8] text-[#FAFAFA] rounded-full font-black text-lg">
+                            class="btn-primary w-full py-4 rounded-full text-lg mt-6">
                         회원가입
                     </button>
                 </form>
                 
                 <!-- Back to Home -->
                 <div class="text-center mt-8">
-                    <a href="/" class="text-sm text-gray-500 hover:text-[#98FFD8] transition-colors">
+                    <a href="/" class="text-sm text-gray-500 hover:text-gray-800 transition-colors">
                         ← 홈으로 돌아가기
                     </a>
                 </div>
