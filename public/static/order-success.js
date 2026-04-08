@@ -186,7 +186,7 @@
     function showFlashAnimation() {
         const flash = document.createElement('div');
         flash.style.cssText = 
-            'position: fixed; inset: 0; background: #00FF85; z-index: 9999; ' +
+            'position: fixed; inset: 0; background: #98FFD8; z-index: 9999; ' +
             'opacity: 0; pointer-events: none; animation: flash 0.6s ease-out;';
         
         document.body.appendChild(flash);

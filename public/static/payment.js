@@ -97,7 +97,7 @@ async function initializePayment() {
         
         const orderId = orderData.order.id;
         const amount = 9900; // Fixed price
-        const orderName = 'Urban Fresh Collection';
+        const orderName = 'Lightly Collection';
         
         // Request payment info
         console.log('💳 Requesting payment info...');

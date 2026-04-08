@@ -126,7 +126,7 @@
         localStorage.setItem('selectedSpotTimestamp', Date.now().toString());
         
         // Show feedback
-        this.style.borderColor = '#00FF85';
+        this.style.borderColor = '#98FFD8';
         this.style.background = 'rgba(0, 255, 133, 0.08)';
         
         // Navigate after animation

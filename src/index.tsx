@@ -21,8 +21,11 @@ app.use('/static/*', serveStatic({ root: './public' }))
 app.post('/api/auth/signup', async (c) => {
   try {
     const { email, password, name } = await c.req.json()
+    console.log('🔵 회원가입 API 호출:', { email, name, passwordLength: password?.length })
+    
     const supabase = createSupabaseClient(c.env)
     
+    console.log('🔵 Supabase signUp 호출 중...')
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -33,13 +36,23 @@ app.post('/api/auth/signup', async (c) => {
       }
     })
     
-    if (error) throw error
+    console.log('🔵 Supabase signUp 응답:', { 
+      hasUser: !!data.user, 
+      hasSession: !!data.session,
+      error: error?.message 
+    })
+    
+    if (error) {
+      console.log('❌ Supabase 에러:', error)
+      throw error
+    }
     
     return c.json({ 
       user: data.user,
       session: data.session 
     })
   } catch (error: any) {
+    console.log('❌ 회원가입 실패:', error.message)
     return c.json({ error: error.message }, 400)
   }
 })
@@ -275,7 +288,7 @@ app.post('/api/orders', async (c) => {
         status: 'crafting',
         pickup_code: pickupCode,
         qr_code: `URB-QR-${Date.now()}`,
-        pickup_location: spot?.pickup_location || 'B1층 Urban Fresh Zone'
+        pickup_location: spot?.pickup_location || 'B1층 Lightly Zone'
       })
       .select()
       .single()
@@ -583,10 +596,10 @@ app.get('/', (c) => {
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-        <meta name="theme-color" content="#1A1A1B">
+        <meta name="theme-color" content="#FAFAFA">
         <meta name="apple-mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-        <title>Urban Fresh</title>
+        <title>Lightly</title>
         <script src="https://cdn.tailwindcss.com"></script>
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -606,18 +619,18 @@ app.get('/', (c) => {
             
             body {
                 font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-                background: #1A1A1B;
-                color: #F9FAFB;
+                background: #FAFAFA;
+                color: #001F3F;
                 -webkit-font-smoothing: antialiased;
                 -moz-osx-font-smoothing: grayscale;
             }
             
             .neo-mint {
-                color: #00FF85;
+                color: #98FFD8;
             }
             
             .neo-mint-bg {
-                background: #00FF85;
+                background: #98FFD8;
             }
             
             /* Bold Header Typography */
@@ -655,7 +668,7 @@ app.get('/', (c) => {
             
             .spot-card:active {
                 transform: scale(0.98);
-                border-color: #00FF85;
+                border-color: #98FFD8;
             }
             
             .spot-card.selected::before {
@@ -675,7 +688,7 @@ app.get('/', (c) => {
                 width: 6px;
                 height: 6px;
                 border-radius: 50%;
-                background: #00FF85;
+                background: #98FFD8;
                 animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
             }
             
@@ -693,7 +706,7 @@ app.get('/', (c) => {
             /* Loading spinner */
             .spinner {
                 border: 3px solid rgba(249, 250, 251, 0.1);
-                border-top-color: #00FF85;
+                border-top-color: #98FFD8;
                 border-radius: 50%;
                 width: 32px;
                 height: 32px;
@@ -729,7 +742,7 @@ app.get('/', (c) => {
                 <!-- User Icon - Top Right -->
                 <div class="absolute top-8 right-6 z-50">
                     <a href="/my-rhythm">
-                        <div class="w-10 h-10 rounded-full border-2 border-gray-700 flex items-center justify-center hover:border-[#00FF85] transition-colors active:scale-95">
+                        <div class="w-10 h-10 rounded-full border-2 border-gray-700 flex items-center justify-center hover:border-[#98FFD8] transition-colors active:scale-95">
                             <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                             </svg>
@@ -784,9 +797,9 @@ app.get('/dashboard', (c) => {
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-        <meta name="theme-color" content="#1A1A1B">
+        <meta name="theme-color" content="#FAFAFA">
         <meta name="apple-mobile-web-app-capable" content="yes">
-        <title>Urban Fresh - Collections</title>
+        <title>Lightly - Collections</title>
         <script src="https://cdn.tailwindcss.com"></script>
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
         <style>
@@ -804,18 +817,18 @@ app.get('/dashboard', (c) => {
             
             body {
                 font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-                background: #1A1A1B;
-                color: #F9FAFB;
+                background: #FAFAFA;
+                color: #001F3F;
                 -webkit-font-smoothing: antialiased;
                 padding-bottom: 100px; /* Space for floating button */
             }
             
             .neo-mint {
-                color: #00FF85;
+                color: #98FFD8;
             }
             
             .neo-mint-bg {
-                background: #00FF85;
+                background: #98FFD8;
             }
             
             /* Collection Card */
@@ -828,7 +841,7 @@ app.get('/dashboard', (c) => {
             
             .collection-card:active {
                 transform: scale(0.98);
-                border-color: #00FF85;
+                border-color: #98FFD8;
             }
             
             /* Image Placeholder with Gradient */
@@ -881,7 +894,7 @@ app.get('/dashboard', (c) => {
                 bottom: 0;
                 left: 0;
                 right: 0;
-                background: #1A1A1B;
+                background: #FAFAFA;
                 border-top-left-radius: 24px;
                 border-top-right-radius: 24px;
                 transform: translateY(100%);
@@ -918,12 +931,12 @@ app.get('/dashboard', (c) => {
     </head>
     <body>
         <!-- Header with Spot & Timer -->
-        <header class="sticky top-0 z-40 bg-gradient-to-b from-[#1A1A1B] to-transparent backdrop-blur-sm">
+        <header class="sticky top-0 z-40 bg-gradient-to-b from-[#FAFAFA] to-transparent backdrop-blur-sm">
             <div class="px-6 pt-8 pb-4">
                 <!-- User Icon - Top Right -->
                 <div class="absolute top-6 right-6 z-50">
                     <a href="/my-rhythm">
-                        <div class="w-10 h-10 rounded-full border-2 border-gray-700 flex items-center justify-center hover:border-[#00FF85] transition-colors active:scale-95">
+                        <div class="w-10 h-10 rounded-full border-2 border-gray-700 flex items-center justify-center hover:border-[#98FFD8] transition-colors active:scale-95">
                             <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                             </svg>
@@ -939,7 +952,7 @@ app.get('/dashboard', (c) => {
                     </div>
                     
                     <!-- Real-time Timer -->
-                    <div class="text-right timer-pulse border-2 border-[#00FF85]/30 rounded-xl px-3 py-2">
+                    <div class="text-right timer-pulse border-2 border-[#98FFD8]/30 rounded-xl px-3 py-2">
                         <div class="text-xs text-gray-500 mb-0.5 font-medium">마감까지</div>
                         <div id="countdown" class="text-sm font-black neo-mint">--:--:--</div>
                     </div>
@@ -960,21 +973,21 @@ app.get('/dashboard', (c) => {
             <div class="space-y-5" id="collectionsContainer">
                 <!-- Loading -->
                 <div class="text-center py-12">
-                    <div class="inline-block w-8 h-8 border-4 border-gray-800 border-t-[#00FF85] rounded-full animate-spin"></div>
+                    <div class="inline-block w-8 h-8 border-4 border-gray-800 border-t-[#98FFD8] rounded-full animate-spin"></div>
                     <p class="mt-4 text-sm text-gray-500">메뉴 불러오는 중...</p>
                 </div>
             </div>
         </main>
         
         <!-- Floating Button (Hidden initially) -->
-        <button id="reviewButton" class="floating-button bg-[#00FF85] text-[#1A1A1B] py-4 rounded-full font-black text-base hidden">
+        <button id="reviewButton" class="floating-button bg-[#98FFD8] text-[#FAFAFA] py-4 rounded-full font-black text-base hidden">
             Review Your Collection
         </button>
         
         <!-- Drawer (Slide-up Detail View) -->
         <div class="drawer-backdrop" id="drawerBackdrop"></div>
         <div class="drawer safe-bottom" id="drawer">
-            <div class="sticky top-0 bg-[#1A1A1B] z-10 px-6 pt-6 pb-4">
+            <div class="sticky top-0 bg-[#FAFAFA] z-10 px-6 pt-6 pb-4">
                 <div class="w-12 h-1 bg-gray-700 rounded-full mx-auto mb-6"></div>
                 <button id="closeDrawer" class="text-gray-400 text-sm font-medium">← 닫기</button>
             </div>
@@ -997,8 +1010,8 @@ app.get('/order-success', (c) => {
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-        <meta name="theme-color" content="#1A1A1B">
-        <title>Urban Fresh - Order Confirmed</title>
+        <meta name="theme-color" content="#FAFAFA">
+        <title>Lightly - Order Confirmed</title>
         <script src="https://cdn.tailwindcss.com"></script>
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
         <style>
@@ -1010,14 +1023,14 @@ app.get('/order-success', (c) => {
             
             body {
                 font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-                background: #1A1A1B;
-                color: #F9FAFB;
+                background: #FAFAFA;
+                color: #001F3F;
                 min-height: 100vh;
                 overflow-x: hidden;
             }
             
             .neo-mint {
-                color: #00FF85;
+                color: #98FFD8;
             }
             
             /* Fade In Animation */
@@ -1064,7 +1077,7 @@ app.get('/order-success', (c) => {
                 left: 0;
                 top: 0;
                 height: 100%;
-                background: #00FF85;
+                background: #98FFD8;
                 width: 33.33%;
                 box-shadow: 0 0 20px rgba(0, 255, 133, 0.5);
             }
@@ -1086,14 +1099,14 @@ app.get('/order-success', (c) => {
                 width: 12px;
                 height: 12px;
                 border-radius: 50%;
-                background: #1A1A1B;
+                background: #FAFAFA;
                 border: 2px solid rgba(249, 250, 251, 0.2);
                 transition: all 0.3s;
             }
             
             .pulse-dot.active {
-                background: #00FF85;
-                border-color: #00FF85;
+                background: #98FFD8;
+                border-color: #98FFD8;
                 box-shadow: 0 0 20px rgba(0, 255, 133, 0.6);
                 animation: pulseDot 2s ease-in-out infinite;
             }
@@ -1114,7 +1127,7 @@ app.get('/order-success', (c) => {
             }
             
             .btn-line-art:active {
-                border-color: #00FF85;
+                border-color: #98FFD8;
                 background: rgba(0, 255, 133, 0.05);
                 transform: scale(0.98);
             }
@@ -1125,7 +1138,7 @@ app.get('/order-success', (c) => {
                 bottom: 0;
                 left: 0;
                 right: 0;
-                background: #1A1A1B;
+                background: #FAFAFA;
                 border-top-left-radius: 32px;
                 border-top-right-radius: 32px;
                 transform: translateY(100%);
@@ -1180,7 +1193,7 @@ app.get('/order-success', (c) => {
         <!-- User Icon - Top Right -->
         <div class="fixed top-8 right-6 z-50">
             <a href="/my-rhythm">
-                <div class="w-10 h-10 rounded-full border-2 border-gray-700 flex items-center justify-center hover:border-[#00FF85] transition-colors active:scale-95">
+                <div class="w-10 h-10 rounded-full border-2 border-gray-700 flex items-center justify-center hover:border-[#98FFD8] transition-colors active:scale-95">
                     <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                     </svg>
@@ -1256,7 +1269,7 @@ app.get('/order-success', (c) => {
                 
                 <!-- Digital Pickup Pass (Hidden initially) -->
                 <div id="pickupPassCard" class="mb-12" style="display: none;">
-                    <div class="bg-gradient-to-br from-gray-900 to-black border-2 border-[#00FF85] rounded-3xl p-8 text-center">
+                    <div class="bg-gradient-to-br from-gray-900 to-black border-2 border-[#98FFD8] rounded-3xl p-8 text-center">
                         <div class="text-xs text-gray-500 uppercase tracking-wider mb-4 font-semibold">
                             Digital Pickup Pass
                         </div>
@@ -1321,7 +1334,7 @@ app.get('/order-success', (c) => {
                 <!-- Admin Simulator (Dev Only) -->
                 <div id="adminPanel" class="fixed bottom-4 right-4 bg-gray-900 border border-gray-700 rounded-xl p-4 text-xs opacity-50 hover:opacity-100 transition z-50">
                     <div class="font-bold mb-2 text-gray-400">🔧 Admin Test</div>
-                    <div class="text-gray-500 mb-2">Status: <span id="adminStatus" class="text-[#00FF85]">CRAFTING</span></div>
+                    <div class="text-gray-500 mb-2">Status: <span id="adminStatus" class="text-[#98FFD8]">CRAFTING</span></div>
                     <button id="nextStatusBtn" class="w-full py-2 bg-gray-800 hover:bg-gray-700 rounded-lg text-white font-semibold">
                         Next Status →
                     </button>
@@ -1334,7 +1347,7 @@ app.get('/order-success', (c) => {
         <!-- Pickup Details Modal -->
         <div class="modal-backdrop" id="modalBackdrop"></div>
         <div class="pickup-modal" id="pickupModal">
-            <div class="sticky top-0 bg-[#1A1A1B] z-10 px-6 pt-6 pb-4 border-b border-gray-800">
+            <div class="sticky top-0 bg-[#FAFAFA] z-10 px-6 pt-6 pb-4 border-b border-gray-800">
                 <div class="w-12 h-1 bg-gray-700 rounded-full mx-auto mb-6"></div>
                 <button id="closeModal" class="text-gray-400 text-sm font-medium">✕ 닫기</button>
             </div>
@@ -1371,7 +1384,7 @@ app.get('/order-success', (c) => {
                 </div>
                 
                 <!-- Guide Section -->
-                <div class="bg-gradient-to-br from-green-900/20 to-emerald-900/10 border border-[#00FF85]/20 rounded-xl p-4">
+                <div class="bg-gradient-to-br from-green-900/20 to-emerald-900/10 border border-[#98FFD8]/20 rounded-xl p-4">
                     <div class="flex items-start gap-3">
                         <div class="text-2xl">🔐</div>
                         <div>
@@ -1399,8 +1412,8 @@ app.get('/my-rhythm', (c) => {
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-        <meta name="theme-color" content="#1A1A1B">
-        <title>Urban Fresh - My Rhythm</title>
+        <meta name="theme-color" content="#FAFAFA">
+        <title>Lightly - My Rhythm</title>
         <script src="https://cdn.tailwindcss.com"></script>
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
         <style>
@@ -1413,18 +1426,18 @@ app.get('/my-rhythm', (c) => {
             
             body {
                 font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-                background: #1A1A1B;
-                color: #F9FAFB;
+                background: #FAFAFA;
+                color: #001F3F;
                 min-height: 100vh;
                 overflow-x: hidden;
             }
             
             .neo-mint {
-                color: #00FF85;
+                color: #98FFD8;
             }
             
             .neo-mint-bg {
-                background: #00FF85;
+                background: #98FFD8;
             }
             
             /* Active Order Card */
@@ -1479,7 +1492,7 @@ app.get('/my-rhythm', (c) => {
             
             .status-crafting {
                 background: rgba(0, 255, 133, 0.1);
-                color: #00FF85;
+                color: #98FFD8;
                 border: 1px solid rgba(0, 255, 133, 0.3);
             }
             
@@ -1520,7 +1533,7 @@ app.get('/my-rhythm', (c) => {
                 <!-- User Info -->
                 <div class="mb-8">
                     <div class="flex items-center gap-3 mb-2">
-                        <div class="w-12 h-12 rounded-full border-2 border-[#00FF85] flex items-center justify-center">
+                        <div class="w-12 h-12 rounded-full border-2 border-[#98FFD8] flex items-center justify-center">
                             <svg class="w-6 h-6 neo-mint" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                             </svg>
@@ -1542,7 +1555,7 @@ app.get('/my-rhythm', (c) => {
                                 <div class="text-xs text-gray-400" id="activeSpotName">--</div>
                             </div>
                             <div class="status-badge status-crafting">
-                                <div class="w-2 h-2 rounded-full bg-[#00FF85]"></div>
+                                <div class="w-2 h-2 rounded-full bg-[#98FFD8]"></div>
                                 <span id="activeStatus">Crafting</span>
                             </div>
                         </div>
@@ -1561,7 +1574,7 @@ app.get('/my-rhythm', (c) => {
                     <div class="space-y-3" id="historyContainer">
                         <!-- Loading -->
                         <div class="text-center py-12">
-                            <div class="inline-block w-8 h-8 border-4 border-gray-800 border-t-[#00FF85] rounded-full animate-spin"></div>
+                            <div class="inline-block w-8 h-8 border-4 border-gray-800 border-t-[#98FFD8] rounded-full animate-spin"></div>
                             <p class="mt-4 text-sm text-gray-500">히스토리 불러오는 중...</p>
                         </div>
                     </div>
@@ -1585,19 +1598,19 @@ app.get('/payment', (c) => {
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Urban Fresh - Payment</title>
+        <title>Lightly - Payment</title>
         <script src="https://cdn.tailwindcss.com"></script>
         <style>
             body {
                 font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-                background: #1A1A1B;
-                color: #F9FAFB;
+                background: #FAFAFA;
+                color: #001F3F;
             }
         </style>
     </head>
     <body class="min-h-screen flex items-center justify-center p-6">
         <div class="text-center">
-            <div class="animate-spin w-12 h-12 border-4 border-gray-800 border-t-[#00FF85] rounded-full mx-auto mb-4"></div>
+            <div class="animate-spin w-12 h-12 border-4 border-gray-800 border-t-[#98FFD8] rounded-full mx-auto mb-4"></div>
             <p class="text-gray-400">결제를 준비하고 있습니다...</p>
         </div>
         <!-- Load Toss Payments SDK first, then our script -->
@@ -1617,21 +1630,21 @@ app.get('/payment-success', (c) => {
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Urban Fresh - Payment Success</title>
+        <title>Lightly - Payment Success</title>
         <script src="https://cdn.tailwindcss.com"></script>
         <style>
             body {
                 font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-                background: #1A1A1B;
-                color: #F9FAFB;
+                background: #FAFAFA;
+                color: #001F3F;
             }
         </style>
     </head>
     <body class="min-h-screen flex items-center justify-center p-6">
         <div class="max-w-md w-full text-center">
             <div class="mb-8">
-                <div class="w-20 h-20 bg-[#00FF85] rounded-full flex items-center justify-center mx-auto mb-4">
-                    <svg class="w-10 h-10 text-[#1A1A1B]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="w-20 h-20 bg-[#98FFD8] rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-10 h-10 text-[#FAFAFA]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
                     </svg>
                 </div>
@@ -1689,13 +1702,13 @@ app.get('/payment-fail', (c) => {
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Urban Fresh - Payment Failed</title>
+        <title>Lightly - Payment Failed</title>
         <script src="https://cdn.tailwindcss.com"></script>
         <style>
             body {
                 font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-                background: #1A1A1B;
-                color: #F9FAFB;
+                background: #FAFAFA;
+                color: #001F3F;
             }
         </style>
     </head>
@@ -1711,7 +1724,7 @@ app.get('/payment-fail', (c) => {
                 <p class="text-gray-400" id="errorMessage">결제가 취소되었거나 오류가 발생했습니다</p>
             </div>
             <button onclick="window.location.href='/dashboard'" 
-                    class="w-full py-4 bg-[#00FF85] text-[#1A1A1B] rounded-full font-black text-lg">
+                    class="w-full py-4 bg-[#98FFD8] text-[#FAFAFA] rounded-full font-black text-lg">
                 다시 주문하기
             </button>
         </div>
@@ -1735,8 +1748,8 @@ app.get('/login', (c) => {
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-        <meta name="theme-color" content="#1A1A1B">
-        <title>Urban Fresh - Login</title>
+        <meta name="theme-color" content="#FAFAFA">
+        <title>Lightly - Login</title>
         <script src="https://cdn.tailwindcss.com"></script>
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
         <style>
@@ -1749,17 +1762,17 @@ app.get('/login', (c) => {
             
             body {
                 font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-                background: #1A1A1B;
-                color: #F9FAFB;
+                background: #FAFAFA;
+                color: #001F3F;
                 -webkit-font-smoothing: antialiased;
             }
             
             .neo-mint {
-                color: #00FF85;
+                color: #98FFD8;
             }
             
             .neo-mint-bg {
-                background: #00FF85;
+                background: #98FFD8;
             }
             
             .input-field {
@@ -1770,7 +1783,7 @@ app.get('/login', (c) => {
             
             .input-field:focus {
                 background: rgba(249, 250, 251, 0.06);
-                border-color: #00FF85;
+                border-color: #98FFD8;
                 outline: none;
             }
             
@@ -1782,8 +1795,8 @@ app.get('/login', (c) => {
             }
             
             .tab-button.active {
-                color: #00FF85;
-                border-bottom-color: #00FF85;
+                color: #98FFD8;
+                border-bottom-color: #98FFD8;
             }
         </style>
     </head>
@@ -1820,7 +1833,7 @@ app.get('/login', (c) => {
                     </div>
                     <div id="loginError" class="text-red-400 text-sm hidden"></div>
                     <button type="submit" 
-                            class="w-full py-4 bg-[#00FF85] text-[#1A1A1B] rounded-full font-black text-lg">
+                            class="w-full py-4 bg-[#98FFD8] text-[#FAFAFA] rounded-full font-black text-lg">
                         로그인
                     </button>
                 </form>
@@ -1853,14 +1866,14 @@ app.get('/login', (c) => {
                     </div>
                     <div id="signupError" class="text-red-400 text-sm hidden"></div>
                     <button type="submit" id="signupButton"
-                            class="w-full py-4 bg-[#00FF85] text-[#1A1A1B] rounded-full font-black text-lg">
+                            class="w-full py-4 bg-[#98FFD8] text-[#FAFAFA] rounded-full font-black text-lg">
                         회원가입
                     </button>
                 </form>
                 
                 <!-- Back to Home -->
                 <div class="text-center mt-8">
-                    <a href="/" class="text-sm text-gray-500 hover:text-[#00FF85] transition-colors">
+                    <a href="/" class="text-sm text-gray-500 hover:text-[#98FFD8] transition-colors">
                         ← 홈으로 돌아가기
                     </a>
                 </div>
@@ -1937,10 +1950,13 @@ app.get('/login', (c) => {
                 const errorEl = document.getElementById('signupError');
                 const submitButton = document.getElementById('signupButton');
                 
+                console.log('🚀 회원가입 시작:', { name, email, passwordLength: password.length });
+                
                 errorEl.classList.add('hidden');
                 
                 // Validate password match
                 if (password !== passwordConfirm) {
+                    console.log('❌ 비밀번호 불일치');
                     errorEl.textContent = '비밀번호가 일치하지 않습니다.';
                     errorEl.classList.remove('hidden');
                     return;
@@ -1948,6 +1964,7 @@ app.get('/login', (c) => {
                 
                 // Validate password length
                 if (password.length < 6) {
+                    console.log('❌ 비밀번호 길이 부족:', password.length);
                     errorEl.textContent = '비밀번호는 최소 6자 이상이어야 합니다.';
                     errorEl.classList.remove('hidden');
                     return;
@@ -1958,15 +1975,18 @@ app.get('/login', (c) => {
                 submitButton.textContent = '처리 중...';
                 
                 try {
+                    console.log('📡 API 요청 시작...');
                     const response = await fetch('/api/auth/signup', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ email, password, name })
                     });
                     
+                    console.log('📡 API 응답 수신:', response.status, response.statusText);
+                    
                     const data = await response.json();
                     
-                    console.log('Signup response:', data);
+                    console.log('📦 응답 데이터:', data);
                     
                     if (data.session) {
                         // Save session and auto-login
@@ -1976,7 +1996,7 @@ app.get('/login', (c) => {
                         errorEl.textContent = '회원가입 완료! 로그인되었습니다.';
                         errorEl.classList.remove('hidden');
                         errorEl.classList.remove('text-red-400');
-                        errorEl.classList.add('text-[#00FF85]');
+                        errorEl.classList.add('text-[#98FFD8]');
                         
                         // Redirect after short delay
                         setTimeout(() => {
@@ -1989,7 +2009,7 @@ app.get('/login', (c) => {
                         errorEl.textContent = '회원가입 완료! 로그인을 시도합니다...';
                         errorEl.classList.remove('hidden');
                         errorEl.classList.remove('text-red-400');
-                        errorEl.classList.add('text-[#00FF85]');
+                        errorEl.classList.add('text-[#98FFD8]');
                         
                         // Try to login immediately with the same credentials
                         setTimeout(async () => {
@@ -2015,7 +2035,7 @@ app.get('/login', (c) => {
                                 } else {
                                     // Login failed, show instructions
                                     errorEl.textContent = '⚠️ 회원가입은 완료되었으나 이메일 확인이 필요합니다.\\n\\nSupabase 대시보드 → Authentication → Settings에서\\n"Confirm email"을 비활성화한 후 로그인해주세요.';
-                                    errorEl.classList.remove('text-[#00FF85]');
+                                    errorEl.classList.remove('text-[#98FFD8]');
                                     errorEl.classList.add('text-yellow-400');
                                     errorEl.style.whiteSpace = 'pre-line';
                                     

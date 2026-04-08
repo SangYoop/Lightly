@@ -216,7 +216,7 @@
             '</div>' +
             
             '<!-- Weekly Wellness (건기식) -->' +
-            '<div class="mb-6 bg-gradient-to-r from-green-900/20 to-emerald-900/10 border border-[#00FF85]/20 rounded-2xl p-5">' +
+            '<div class="mb-6 bg-gradient-to-r from-green-900/20 to-emerald-900/10 border border-[#98FFD8]/20 rounded-2xl p-5">' +
                 '<div class="flex items-center gap-2 mb-3">' +
                     '<span class="text-2xl">💊</span>' +
                     '<div class="text-sm font-bold neo-mint">Weekly Wellness</div>' +
@@ -226,7 +226,7 @@
             '</div>' +
             
             '<!-- Confirm & Reserve Button -->' +
-            '<button class="w-full py-5 bg-[#00FF85] text-[#1A1A1B] rounded-full font-black text-lg tracking-tight" ' +
+            '<button class="w-full py-5 bg-[#98FFD8] text-[#FAFAFA] rounded-full font-black text-lg tracking-tight" ' +
                     'onclick="window.confirmAndReserve(\'' + collection.id + '\')">' +
                 'Confirm & Reserve · ₩9,900' +
             '</button>';
@@ -277,15 +277,15 @@
     function showConnectingAnimation() {
         const overlay = document.createElement('div');
         overlay.style.cssText = 
-            'position: fixed; inset: 0; background: #1A1A1B; z-index: 1000; ' +
+            'position: fixed; inset: 0; background: #FAFAFA; z-index: 1000; ' +
             'display: flex; flex-direction: column; align-items: center; justify-content: center; ' +
             'animation: fadeIn 0.3s ease-out;';
         
         overlay.innerHTML = 
             '<div style="text-align: center;">' +
                 '<div style="width: 80px; height: 80px; margin: 0 auto 32px; border: 3px solid rgba(0,255,133,0.2); ' +
-                     'border-top-color: #00FF85; border-radius: 50%; animation: spin 1s linear infinite;"></div>' +
-                '<div style="font-size: 1.25rem; font-weight: 700; color: #F9FAFB; margin-bottom: 8px;">Connecting to the kitchen</div>' +
+                     'border-top-color: #98FFD8; border-radius: 50%; animation: spin 1s linear infinite;"></div>' +
+                '<div style="font-size: 1.25rem; font-weight: 700; color: #001F3F; margin-bottom: 8px;">Connecting to the kitchen</div>' +
                 '<div style="font-size: 0.875rem; color: #6B7280;">주문을 전송하는 중...</div>' +
             '</div>';
         
